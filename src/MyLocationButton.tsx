@@ -1,12 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 
+type TMyLocationButtonProps = {
+  onMoveMyLocation: () => void;
+};
+
 const Container = styled.div`
   position: fixed;
-  top: 60px;
-  right: 10px;
-  width: 85px;
-  height: 40px;
+  top: 70px;
+  left: 20px;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.99);
   color: black;
@@ -17,14 +19,18 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 3px;
+  padding: 20px;
   @media (max-width: 1023px) {
-    width: 65px;
-    height: 25px;
+    top: 56px;
+    left: 10px;
     font-size: 11px;
+    padding: 10px;
   }
 `;
 
-const MyLocationButton: React.FC<any> = ({ onMoveMyLocation }) => {
+const MyLocationButton: React.FC<TMyLocationButtonProps> = ({
+  onMoveMyLocation
+}) => {
   return <Container onClick={onMoveMyLocation}>내 위치 보기</Container>;
 };
 

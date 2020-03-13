@@ -4,6 +4,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFirstAid } from "@fortawesome/free-solid-svg-icons";
 import { convertRemainStatusText, convertRemainStatusColor } from "./utils";
 
+type TStoreProps = {
+  key: any;
+  lat: any;
+  lng: any;
+  currentZoom: number;
+  storeData: any;
+  onCurrentHover: boolean;
+  onCurrentClick: boolean;
+  onMouseOverStore: (code: number) => void;
+  onMouseLeaveStore: () => void;
+  onClickStore: (lat: number, lng: number, code: number) => void;
+};
+
 const Container = styled.div<{ currentZoom: number; statusColor: string }>`
   position: relative;
   display: flex;
@@ -72,7 +85,7 @@ const StoreDetail = styled.div<{ statusColor: string }>`
   }
 `;
 
-const Store: React.FC<any> = ({
+const Store: React.FC<TStoreProps> = ({
   storeData,
   onCurrentHover,
   onCurrentClick,

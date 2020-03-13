@@ -3,7 +3,7 @@ import reset from "styled-reset";
 
 export const InitialStyle = createGlobalStyle`
   ${reset}
-  div, p, span, h1, h2, h3, h4, h5, ul, li, input, textarea {
+  div, p, span, h1, h2, h3, h4, h5, ul, li, input, textarea,button, form {
     box-sizing: border-box;
     border:none;
     padding: 0;

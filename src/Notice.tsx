@@ -22,6 +22,7 @@ const Container = styled.div`
 `;
 
 const Notice: React.FC = () => {
+  // eslint-disable-next-line jsx-a11y/accessible-emoji
   return <Container>확대하면 보여요😅</Container>;
 };
 

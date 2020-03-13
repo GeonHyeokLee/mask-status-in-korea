@@ -7,6 +7,34 @@ import Notice from "./Notice";
 import MyLocationButton from "./MyLocationButton";
 import { GOOGLE_MAP_API } from "./dotenv";
 import AddressBar from "./AddressBar";
+import { geoCode, reverseGeoCode } from "./utils";
+
+type TMapProps = {
+  currentLocation:
+    | {
+        lat: number;
+        lng: number;
+      }
+    | undefined;
+  setCurrentLocation: React.Dispatch<
+    React.SetStateAction<
+      | {
+          lat: number;
+          lng: number;
+        }
+      | undefined
+    >
+  >;
+  myLocation:
+    | {
+        lat: number;
+        lng: number;
+      }
+    | undefined;
+  updateStoreData: (lat: number, lng: number) => void;
+  storeList: any;
+  getStoreListLoading: boolean;
+};
 
 const Container = styled.div`
   position: absolute;
@@ -20,7 +48,7 @@ const Container = styled.div`
   }
 `;
 
-const Map: React.FC<any> = ({
+const Map: React.FC<TMapProps> = ({
   currentLocation,
   setCurrentLocation,
   myLocation,
@@ -31,6 +59,7 @@ const Map: React.FC<any> = ({
   const [currentHoverStore, setCurrentHoverStore] = useState<number>();
   const [currentClickStore, setCurrentClickStore] = useState<number>();
   const [currentZoom, setCurrentZoom] = useState<number>(16);
+  const [address, setAddress] = useState<string>("");
 
   const initialEvent = useCallback(
     (hover: boolean = true, click: boolean = true) => {
@@ -61,13 +90,15 @@ const Map: React.FC<any> = ({
   }, []);
 
   const onChangeMap = useCallback(
-    ({ center }: any) => {
-      setCurrentLocation((prev: any) => ({
+    async ({ center }) => {
+      setCurrentLocation(prev => ({
         ...prev,
         lat: center.lat,
         lng: center.lng
       }));
       updateStoreData(center.lat, center.lng);
+      const { address } = await reverseGeoCode(center.lat, center.lng);
+      setAddress(address);
     },
     [setCurrentLocation, updateStoreData]
   );
@@ -78,7 +109,7 @@ const Map: React.FC<any> = ({
 
   const onClickStore = useCallback(
     (lat: number, lng: number, code: number) => {
-      setCurrentLocation((prev: any) => ({
+      setCurrentLocation(prev => ({
         ...prev,
         lat,
         lng
@@ -104,9 +135,27 @@ const Map: React.FC<any> = ({
     onMouseLeaveStore();
   }, [myLocation, onMouseLeaveStore, setCurrentLocation]);
 
+  const onSubmitAddress = useCallback(
+    async (address: string) => {
+      const result = await geoCode(address);
+      setCurrentLocation(prev => ({
+        ...prev,
+        lat: result.lat,
+        lng: result.lng
+      }));
+      setCurrentZoom(17);
+      setAddress(result.address);
+    },
+    [setCurrentLocation]
+  );
+
   return (
     <>
-      <AddressBar />
+      <AddressBar
+        onSubmitAddress={onSubmitAddress}
+        address={address}
+        setAddress={setAddress}
+      />
       <Information />
       <MyLocationButton onMoveMyLocation={onMoveMyLocation} />
       {currentZoom < 13 && <Notice />}
