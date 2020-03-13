@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import styled from "styled-components";
 import { color } from "./initialStyles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -29,7 +29,7 @@ const Container = styled.div`
     justify-content: space-between;
     align-items: center;
     input {
-      background-color: rgba(0, 0, 0, 0.7);
+      background-color: rgba(0, 0, 0, 0.6);
       border: none;
       width: 100%;
       height: 100%;
@@ -38,6 +38,9 @@ const Container = styled.div`
       border-bottom-left-radius: 3px;
       color: ${color.white};
       font-size: 14px;
+      :focus {
+        outline: none;
+      }
       ::placeholder {
         font-size: 14px;
       }
@@ -53,11 +56,18 @@ const Container = styled.div`
       width: 50px;
       height: 100%;
       border: none;
-      background-color: rgba(0, 0, 0, 0.8);
+      background-color: rgba(0, 0, 0, 0.75);
       border-top-right-radius: 3px;
       border-bottom-right-radius: 3px;
       color: ${color.white};
       cursor: pointer;
+      transition: all 0.2s;
+      :focus {
+        outline: none;
+      }
+      :hover {
+        color: ${color.green};
+      }
     }
   }
 `;
@@ -67,6 +77,8 @@ const AddressBar: React.FC<TAddressBarProps> = ({
   address,
   setAddress
 }) => {
+  const ref = useRef<any>(null);
+
   const onChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const {
@@ -85,6 +97,7 @@ const AddressBar: React.FC<TAddressBarProps> = ({
     ) => {
       event.preventDefault();
       await onSubmitAddress(address);
+      ref.current.focus();
     },
     [address, onSubmitAddress]
   );
@@ -98,7 +111,7 @@ const AddressBar: React.FC<TAddressBarProps> = ({
           onChange={onChange}
           value={address}
         />
-        <button onClick={onSubmit}>
+        <button onClick={onSubmit} ref={ref}>
           <FontAwesomeIcon icon={faSearchLocation} />
         </button>
       </form>

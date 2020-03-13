@@ -7,7 +7,7 @@ import Notice from "./Notice";
 import MyLocationButton from "./MyLocationButton";
 import { GOOGLE_MAP_API } from "./dotenv";
 import AddressBar from "./AddressBar";
-import { geoCode, reverseGeoCode } from "./utils";
+import { geoCode } from "./utils";
 
 type TMapProps = {
   currentLocation:
@@ -97,8 +97,6 @@ const Map: React.FC<TMapProps> = ({
         lng: center.lng
       }));
       updateStoreData(center.lat, center.lng);
-      const { address } = await reverseGeoCode(center.lat, center.lng);
-      setAddress(address);
     },
     [setCurrentLocation, updateStoreData]
   );
@@ -144,7 +142,7 @@ const Map: React.FC<TMapProps> = ({
         lng: result.lng
       }));
       setCurrentZoom(17);
-      setAddress(result.address);
+      setAddress("");
     },
     [setCurrentLocation]
   );

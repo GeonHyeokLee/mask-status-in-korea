@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { color } from "./initialStyles";
 
 type TMyLocationButtonProps = {
   onMoveMyLocation: () => void;
@@ -20,6 +21,10 @@ const Container = styled.div`
   align-items: center;
   border-radius: 3px;
   padding: 20px;
+  transition: all 0.2s;
+  :hover {
+    color: ${color.green};
+  }
   @media (max-width: 1023px) {
     top: 56px;
     left: 10px;
