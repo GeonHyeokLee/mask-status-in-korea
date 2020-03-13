@@ -7,36 +7,58 @@ import { color } from "./initialStyles";
 const Container = styled.div`
   position: fixed;
   display: flex;
-  bottom: 20px;
-  left: 20px;
-  border-radius: 7px;
-  width: 250px;
-  height: 185px;
+  bottom: 0px;
+  left: 0px;
+  border-radius: 3px;
+  width: 300px;
+  height: 230px;
+  margin: 20px;
   padding: 20px;
   z-index: 99;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.8);
   color: #eaeaea;
   flex-direction: column;
   justify-content: space-between;
+  @media (max-width: 1023px) {
+    padding: 10px;
+    margin: 10px;
+    width: 185px;
+    height: 155px;
+  }
   ul {
     li {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
+
       p {
         font-weight: bold;
-        margin-right: 10px;
         font-size: 14px;
+        @media (max-width: 1023px) {
+          font-size: 11px;
+        }
       }
       svg {
         font-size: 18px;
+        @media (max-width: 1023px) {
+          font-size: 13px;
+        }
       }
     }
   }
   h3 {
     font-size: 14px;
+    margin-bottom: 10px;
     font-weight: bold;
+    :last-child {
+      margin-bottom: 0;
+      font-weight: normal;
+    }
+    @media (max-width: 1023px) {
+      font-size: 9px;
+      margin-bottom: 5px;
+    }
   }
 `;
 
@@ -61,7 +83,10 @@ const Information: React.FC = () => {
           <FontAwesomeIcon icon={faFirstAid} color={color.black} />
         </li>
       </ul>
-      <h3>Made by GeonHyeok Lee</h3>
+      <div>
+        <h3>주변 1.5km 반경의 약국을 볼 수 있어요</h3>
+        <h3>Made by GeonHyeok Lee</h3>
+      </div>
     </Container>
   );
 };

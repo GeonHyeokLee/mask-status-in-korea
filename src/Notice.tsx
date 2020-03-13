@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/accessible-emoji */
 import React from "react";
 import styled from "styled-components";
 import { color } from "./initialStyles";
@@ -14,9 +13,12 @@ const Container = styled.div`
   font-size: 28px;
   padding: 25px 20px;
   font-weight: bold;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.7);
   text-align: center;
+  @media (max-width: 1023px) {
+    display: none;
+  }
 `;
 
 const Notice: React.FC = () => {

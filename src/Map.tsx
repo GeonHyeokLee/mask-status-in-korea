@@ -6,13 +6,18 @@ import Information from "./Information";
 import Notice from "./Notice";
 import MyLocationButton from "./MyLocationButton";
 import { GOOGLE_MAP_API } from "./dotenv";
+import AddressBar from "./AddressBar";
 
 const Container = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
+  div.dummyContainer {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const Map: React.FC<any> = ({
@@ -24,11 +29,32 @@ const Map: React.FC<any> = ({
   getStoreListLoading
 }) => {
   const [currentHoverStore, setCurrentHoverStore] = useState<number>();
-  const [currentZoom, setCurrentZoom] = useState<number>(15);
+  const [currentClickStore, setCurrentClickStore] = useState<number>();
+  const [currentZoom, setCurrentZoom] = useState<number>(16);
 
-  const onMouseOverStore = useCallback((code: number) => {
-    setCurrentHoverStore(code);
-  }, []);
+  const initialEvent = useCallback(
+    (hover: boolean = true, click: boolean = true) => {
+      if (hover) {
+        setCurrentHoverStore(-999999);
+      }
+      if (click) {
+        setCurrentClickStore(-999999);
+      }
+    },
+    []
+  );
+
+  const onMouseOverStore = useCallback(
+    (code: number) => {
+      if (code !== currentClickStore) {
+        initialEvent();
+      } else {
+        initialEvent(true, false);
+      }
+      setCurrentHoverStore(code);
+    },
+    [currentClickStore, initialEvent]
+  );
 
   const onMouseLeaveStore = useCallback(() => {
     setCurrentHoverStore(-999999);
@@ -51,16 +77,21 @@ const Map: React.FC<any> = ({
   }, []);
 
   const onClickStore = useCallback(
-    (lat: number, lng: number) => {
+    (lat: number, lng: number, code: number) => {
       setCurrentLocation((prev: any) => ({
         ...prev,
         lat,
         lng
       }));
-      setCurrentZoom(18);
+      if (currentClickStore === code) {
+        setCurrentClickStore(-999999);
+      } else {
+        setCurrentClickStore(code);
+      }
+      setCurrentZoom(17);
       onMouseLeaveStore();
     },
-    [onMouseLeaveStore, setCurrentLocation]
+    [currentClickStore, onMouseLeaveStore, setCurrentLocation]
   );
 
   const onMoveMyLocation = useCallback(() => {
@@ -75,18 +106,19 @@ const Map: React.FC<any> = ({
 
   return (
     <>
+      <AddressBar />
+      <Information />
+      <MyLocationButton onMoveMyLocation={onMoveMyLocation} />
+      {currentZoom < 13 && <Notice />}
       <Container>
-        <Information />
-        <MyLocationButton onMoveMyLocation={onMoveMyLocation} />
-        {currentZoom < 13 && <Notice />}
         <GoogleMapReact
-          bootstrapURLKeys={{
-            key: GOOGLE_MAP_API
-          }}
+          bootstrapURLKeys={{ key: GOOGLE_MAP_API }}
           center={currentLocation}
           zoom={currentZoom}
           onChange={onChangeMap}
           onZoomAnimationEnd={onZoomAnimationEnd}
+          onDragEnd={() => initialEvent()}
+          onClick={() => initialEvent()}
         >
           {!getStoreListLoading &&
             storeList &&
@@ -99,6 +131,7 @@ const Map: React.FC<any> = ({
                 currentZoom={currentZoom}
                 storeData={store}
                 onCurrentHover={store.code !== currentHoverStore ? false : true}
+                onCurrentClick={store.code !== currentClickStore ? false : true}
                 onMouseOverStore={onMouseOverStore}
                 onMouseLeaveStore={onMouseLeaveStore}
                 onClickStore={onClickStore}

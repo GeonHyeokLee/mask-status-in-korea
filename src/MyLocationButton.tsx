@@ -3,9 +3,9 @@ import styled from "styled-components";
 
 const Container = styled.div`
   position: fixed;
-  top: 10px;
-  right: 60px;
-  width: 95px;
+  top: 60px;
+  right: 10px;
+  width: 85px;
   height: 40px;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.99);
@@ -17,10 +17,15 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   border-radius: 3px;
+  @media (max-width: 1023px) {
+    width: 65px;
+    height: 25px;
+    font-size: 11px;
+  }
 `;
 
 const MyLocationButton: React.FC<any> = ({ onMoveMyLocation }) => {
-  return <Container onClick={onMoveMyLocation}>내 위치로 가기</Container>;
+  return <Container onClick={onMoveMyLocation}>내 위치 보기</Container>;
 };
 
 export default MyLocationButton;

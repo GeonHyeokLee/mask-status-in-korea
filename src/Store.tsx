@@ -12,8 +12,8 @@ const Container = styled.div<{ currentZoom: number; statusColor: string }>`
   align-items: center;
   div.svgWrap {
     background-color: rgba(255, 255, 255, 0.99);
-    padding: 1px 2.5px;
-    border-radius: 5px;
+    padding: 0.7px 2px;
+    border-radius: 2px;
     svg {
       font-size: ${props => (props.currentZoom >= 17 ? "30px" : "25px")};
       cursor: pointer;
@@ -30,11 +30,11 @@ const Container = styled.div<{ currentZoom: number; statusColor: string }>`
 
 const StoreDetail = styled.div<{ statusColor: string }>`
   position: absolute;
-  top: -200px;
-  left: -10px;
+  top: -225px;
+  left: -30px;
   width: 200px;
   height: 200px;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: rgba(25, 25, 25, 0.9);
   display: flex;
   flex-direction: column;
@@ -42,6 +42,7 @@ const StoreDetail = styled.div<{ statusColor: string }>`
   font-size: 13px;
   padding: 10px;
   z-index: 1;
+  overflow: hidden;
   h3 {
     font-size: 18px;
     margin-bottom: 5px;
@@ -56,11 +57,25 @@ const StoreDetail = styled.div<{ statusColor: string }>`
       background-color: ${props => props.statusColor};
     }
   }
+  @media (max-width: 1023px) {
+    width: 175px;
+    height: 115px;
+    top: -145px;
+    left: -75px;
+    font-size: 11px;
+    h3 {
+      font-size: 14px;
+    }
+    p {
+      margin-bottom: 5px;
+    }
+  }
 `;
 
 const Store: React.FC<any> = ({
   storeData,
   onCurrentHover,
+  onCurrentClick,
   onMouseOverStore,
   onMouseLeaveStore,
   currentZoom,
@@ -73,7 +88,9 @@ const Store: React.FC<any> = ({
     >
       <div
         className="svgWrap"
-        onClick={() => onClickStore(storeData.lat, storeData.lng)}
+        onClick={() =>
+          onClickStore(storeData.lat, storeData.lng, storeData.code)
+        }
         onMouseOver={() => onMouseOverStore(storeData.code)}
         onMouseLeave={() => onMouseLeaveStore()}
         onPointerLeave={() => onMouseLeaveStore()}
@@ -82,7 +99,7 @@ const Store: React.FC<any> = ({
       </div>
 
       <h3 className="store-name">{currentZoom >= 15 && storeData.name}</h3>
-      {onCurrentHover && (
+      {(onCurrentHover || onCurrentClick) && (
         <StoreDetail
           statusColor={convertRemainStatusColor(storeData.remain_stat)}
         >
