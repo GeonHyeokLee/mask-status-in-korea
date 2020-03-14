@@ -8,8 +8,11 @@ import MyLocationButton from "./MyLocationButton";
 import { GOOGLE_MAP_API } from "./dotenv";
 import AddressBar from "./AddressBar";
 import { geoCode } from "./utils";
+import RefreshButton from "./RefreshButton";
 
 type TMapProps = {
+  setRefreshLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  refreshLoading: boolean;
   currentLocation:
     | {
         lat: number;
@@ -33,8 +36,48 @@ type TMapProps = {
     | undefined;
   updateStoreData: (lat: number, lng: number) => void;
   storeList: any;
-  getStoreListLoading: boolean;
 };
+
+const UtilWrap = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 99;
+  > div.util-button-wrap {
+    display: flex;
+    flex-direction: raw;
+    > div {
+      margin-right: 20px;
+      :last-of-type {
+        margin-right: 0;
+      }
+      @media (max-width: 1023px) {
+        margin-right: 10px;
+        :last-of-type {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+  > div {
+    margin-bottom: 20px;
+    :last-of-type {
+      margin-bottom: 0;
+    }
+    @media (max-width: 1023px) {
+      margin-bottom: 10px;
+      :last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+  @media (max-width: 1023px) {
+    margin: 10px;
+  }
+`;
 
 const Container = styled.div`
   position: absolute;
@@ -54,7 +97,8 @@ const Map: React.FC<TMapProps> = ({
   myLocation,
   storeList,
   updateStoreData,
-  getStoreListLoading
+  refreshLoading,
+  setRefreshLoading
 }) => {
   const [currentHoverStore, setCurrentHoverStore] = useState<number>();
   const [currentClickStore, setCurrentClickStore] = useState<number>();
@@ -76,7 +120,7 @@ const Map: React.FC<TMapProps> = ({
   const onMouseOverStore = useCallback(
     (code: number) => {
       if (code !== currentClickStore) {
-        initialEvent();
+        initialEvent(false);
       } else {
         initialEvent(true, false);
       }
@@ -84,10 +128,6 @@ const Map: React.FC<TMapProps> = ({
     },
     [currentClickStore, initialEvent]
   );
-
-  const onMouseLeaveStore = useCallback(() => {
-    setCurrentHoverStore(-999999);
-  }, []);
 
   const onChangeMap = useCallback(
     async ({ center }) => {
@@ -107,6 +147,7 @@ const Map: React.FC<TMapProps> = ({
 
   const onClickStore = useCallback(
     (lat: number, lng: number, code: number) => {
+      initialEvent();
       setCurrentLocation(prev => ({
         ...prev,
         lat,
@@ -118,20 +159,19 @@ const Map: React.FC<TMapProps> = ({
         setCurrentClickStore(code);
       }
       setCurrentZoom(17);
-      onMouseLeaveStore();
     },
-    [currentClickStore, onMouseLeaveStore, setCurrentLocation]
+    [currentClickStore, initialEvent, setCurrentLocation]
   );
 
   const onMoveMyLocation = useCallback(() => {
+    initialEvent();
     setCurrentLocation((prev: any) => ({
       ...prev,
       lat: myLocation?.lat,
       lng: myLocation?.lng
     }));
     setCurrentZoom(17);
-    onMouseLeaveStore();
-  }, [myLocation, onMouseLeaveStore, setCurrentLocation]);
+  }, [initialEvent, myLocation, setCurrentLocation]);
 
   const onSubmitAddress = useCallback(
     async (address: string) => {
@@ -141,22 +181,19 @@ const Map: React.FC<TMapProps> = ({
         lat: result.lat,
         lng: result.lng
       }));
-      setCurrentZoom(17);
+      setCurrentZoom(16);
       setAddress("");
     },
     [setCurrentLocation]
   );
 
+  const onRefreshStoreData = useCallback(() => {
+    if (currentLocation) {
+      updateStoreData(currentLocation.lat, currentLocation.lng);
+    }
+  }, [currentLocation, updateStoreData]);
   return (
     <>
-      <AddressBar
-        onSubmitAddress={onSubmitAddress}
-        address={address}
-        setAddress={setAddress}
-      />
-      <Information />
-      <MyLocationButton onMoveMyLocation={onMoveMyLocation} />
-      {currentZoom < 13 && <Notice />}
       <Container>
         <GoogleMapReact
           bootstrapURLKeys={{ key: GOOGLE_MAP_API }}
@@ -164,11 +201,11 @@ const Map: React.FC<TMapProps> = ({
           zoom={currentZoom}
           onChange={onChangeMap}
           onZoomAnimationEnd={onZoomAnimationEnd}
-          onDragEnd={() => initialEvent()}
           onClick={() => initialEvent()}
+          onDrag={() => setRefreshLoading(true)}
+          onDragEnd={() => initialEvent()}
         >
-          {!getStoreListLoading &&
-            storeList &&
+          {storeList &&
             currentZoom >= 13 &&
             storeList.map((store: any) => (
               <Store
@@ -180,11 +217,27 @@ const Map: React.FC<TMapProps> = ({
                 onCurrentHover={store.code !== currentHoverStore ? false : true}
                 onCurrentClick={store.code !== currentClickStore ? false : true}
                 onMouseOverStore={onMouseOverStore}
-                onMouseLeaveStore={onMouseLeaveStore}
+                initialEvent={initialEvent}
                 onClickStore={onClickStore}
               />
             ))}
         </GoogleMapReact>
+        <Information />
+        <UtilWrap>
+          <AddressBar
+            onSubmitAddress={onSubmitAddress}
+            address={address}
+            setAddress={setAddress}
+          />
+          <div className="util-button-wrap">
+            <MyLocationButton onMoveMyLocation={onMoveMyLocation} />
+            <RefreshButton
+              onRefreshStoreData={onRefreshStoreData}
+              spin={refreshLoading ? true : false}
+            />
+          </div>
+        </UtilWrap>
+        {currentZoom < 13 && <Notice />}
       </Container>
     </>
   );

@@ -8,8 +8,9 @@ export const InitialStyle = createGlobalStyle`
     border:none;
     padding: 0;
     margin:0;
-    font-family: 'Noto Sans KR', sans-serif;
-    letter-spacing: -0.5px;
+    font-family: 'Noto Sans KR', Arial, -apple-system, Roboto, sans-serif;
+    letter-spacing: -0.8px;
+    -webkit-text-size-adjust: 100%;
   }
 `;
 

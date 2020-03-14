@@ -2,18 +2,14 @@ import React from "react";
 import styled from "styled-components";
 import { color } from "./initialStyles";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
-
-type TMyLocationButtonProps = {
-  onMoveMyLocation: () => void;
-};
+import { faSync } from "@fortawesome/free-solid-svg-icons";
 
 const Container = styled.div`
-  display: flex;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.7);
   font-size: 15px;
   font-weight: bold;
+  display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 3px;
@@ -35,14 +31,12 @@ const Container = styled.div`
   }
 `;
 
-const MyLocationButton: React.FC<TMyLocationButtonProps> = ({
-  onMoveMyLocation
-}) => {
+const RefreshButton: React.FC<any> = ({ onRefreshStoreData, spin }) => {
   return (
-    <Container onClick={onMoveMyLocation}>
-      <FontAwesomeIcon icon={faCrosshairs} />
+    <Container onClick={onRefreshStoreData}>
+      <FontAwesomeIcon icon={faSync} spin={spin} />
     </Container>
   );
 };
 
-export default MyLocationButton;
+export default RefreshButton;

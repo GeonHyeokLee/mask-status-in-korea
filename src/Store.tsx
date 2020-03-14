@@ -13,8 +13,8 @@ type TStoreProps = {
   onCurrentHover: boolean;
   onCurrentClick: boolean;
   onMouseOverStore: (code: number) => void;
-  onMouseLeaveStore: () => void;
   onClickStore: (lat: number, lng: number, code: number) => void;
+  initialEvent: (hover?: boolean, click?: boolean) => void;
 };
 
 const Container = styled.div<{ currentZoom: number; statusColor: string }>`
@@ -43,7 +43,7 @@ const Container = styled.div<{ currentZoom: number; statusColor: string }>`
 
 const StoreDetail = styled.div<{ statusColor: string }>`
   position: absolute;
-  top: -225px;
+  top: -210px;
   left: -30px;
   width: 200px;
   height: 200px;
@@ -55,32 +55,33 @@ const StoreDetail = styled.div<{ statusColor: string }>`
   font-size: 13px;
   padding: 10px;
   z-index: 1;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  @media (max-width: 1023px) {
+    width: 175px;
+    height: 170px;
+    top: -175px;
+    left: -75px;
+    font-size: 11px;
+  }
   h3 {
     font-size: 18px;
     margin-bottom: 5px;
     font-weight: bold;
+    @media (max-width: 1023px) {
+      font-size: 14px;
+    }
   }
   p {
     margin-bottom: 20px;
+    @media (max-width: 1023px) {
+      margin-bottom: 5px;
+    }
   }
   span {
     font-weight: bold;
     > span {
       background-color: ${props => props.statusColor};
-    }
-  }
-  @media (max-width: 1023px) {
-    width: 175px;
-    height: 115px;
-    top: -145px;
-    left: -75px;
-    font-size: 11px;
-    h3 {
-      font-size: 14px;
-    }
-    p {
-      margin-bottom: 5px;
     }
   }
 `;
@@ -90,7 +91,7 @@ const Store: React.FC<TStoreProps> = ({
   onCurrentHover,
   onCurrentClick,
   onMouseOverStore,
-  onMouseLeaveStore,
+  initialEvent,
   currentZoom,
   onClickStore
 }) => {
@@ -105,8 +106,10 @@ const Store: React.FC<TStoreProps> = ({
           onClickStore(storeData.lat, storeData.lng, storeData.code)
         }
         onMouseOver={() => onMouseOverStore(storeData.code)}
-        onMouseLeave={() => onMouseLeaveStore()}
-        onPointerLeave={() => onMouseLeaveStore()}
+        onMouseLeave={() => initialEvent(true, false)}
+        onTouchEnd={() =>
+          onClickStore(storeData.lat, storeData.lng, storeData.code)
+        }
       >
         <FontAwesomeIcon icon={faFirstAid} />
       </div>

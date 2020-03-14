@@ -11,16 +11,12 @@ type TAddressBarProps = {
 };
 
 const Container = styled.div`
-  position: fixed;
-  width: 300px;
-  top: 0;
-  left: 0;
-  height: 40px;
-  margin: 20px;
-  z-index: 99;
+  display: flex;
+  width: 320px;
+  height: 55px;
   @media (max-width: 1023px) {
-    width: 185px;
-    margin: 10px;
+    width: 210px;
+    height: 40px;
   }
   form {
     width: 100%;
@@ -42,13 +38,13 @@ const Container = styled.div`
         outline: none;
       }
       ::placeholder {
-        font-size: 14px;
+        font-size: 15px;
       }
       @media (max-width: 1023px) {
         padding: 10px;
         font-size: 11px;
         ::placeholder {
-          font-size: 11px;
+          font-size: 13px;
         }
       }
     }
@@ -94,6 +90,7 @@ const AddressBar: React.FC<TAddressBarProps> = ({
       event:
         | React.FormEvent<HTMLFormElement>
         | React.MouseEvent<HTMLButtonElement, MouseEvent>
+        | React.TouchEvent<HTMLButtonElement>
     ) => {
       event.preventDefault();
       await onSubmitAddress(address);
@@ -107,11 +104,11 @@ const AddressBar: React.FC<TAddressBarProps> = ({
       <form onSubmit={onSubmit}>
         <input
           name="address"
-          placeholder="Google 지도 검색"
+          placeholder="주소 검색"
           onChange={onChange}
           value={address}
         />
-        <button onClick={onSubmit} ref={ref}>
+        <button onClick={onSubmit} onTouchEnd={onSubmit} ref={ref}>
           <FontAwesomeIcon icon={faSearchLocation} />
         </button>
       </form>

@@ -11,7 +11,7 @@ const Container = styled.div`
   left: 0px;
   border-radius: 3px;
   width: 300px;
-  height: 230px;
+  height: 260px;
   margin: 20px;
   padding: 20px;
   z-index: 99;
@@ -22,8 +22,8 @@ const Container = styled.div`
   @media (max-width: 1023px) {
     padding: 10px;
     margin: 10px;
-    width: 185px;
-    height: 155px;
+    width: 195px;
+    height: 185px;
   }
   ul {
     li {
@@ -31,18 +31,17 @@ const Container = styled.div`
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
-
       p {
         font-weight: bold;
         font-size: 14px;
         @media (max-width: 1023px) {
-          font-size: 11px;
+          font-size: 12px;
         }
       }
       svg {
         font-size: 18px;
         @media (max-width: 1023px) {
-          font-size: 13px;
+          font-size: 14px;
         }
       }
     }
@@ -51,12 +50,17 @@ const Container = styled.div`
     font-size: 14px;
     margin-bottom: 10px;
     font-weight: bold;
+    line-height: 1.3;
     :last-child {
       margin-bottom: 0;
       font-weight: normal;
     }
+    > span {
+      font-weight: bold;
+      color: ${color.green};
+    }
     @media (max-width: 1023px) {
-      font-size: 9px;
+      font-size: 11px;
       margin-bottom: 5px;
     }
   }
@@ -84,8 +88,10 @@ const Information: React.FC = () => {
         </li>
       </ul>
       <div>
-        <h3>주변 1.5km 반경의 약국을 볼 수 있어요</h3>
-        <h3>Made by GeonHyeok Lee</h3>
+        <h3>주변 2km 반경의 약국을 볼 수 있어요</h3>
+        <h3>
+          Made by <span>GeonHyeok Lee</span>
+        </h3>
       </div>
     </Container>
   );
