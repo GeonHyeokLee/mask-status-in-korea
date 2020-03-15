@@ -2,7 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFirstAid } from "@fortawesome/free-solid-svg-icons";
-import { convertRemainStatusText, convertRemainStatusColor } from "./utils";
+import {
+  convertRemainStatusText,
+  convertRemainStatusColor
+} from "../utils/convertRemainStatus";
 
 type TStoreProps = {
   key: any;
@@ -24,11 +27,11 @@ const Container = styled.div<{ currentZoom: number; statusColor: string }>`
   justify-content: center;
   align-items: center;
   div.svgWrap {
-    background-color: rgba(255, 255, 255, 0.99);
-    padding: 0.7px 2px;
-    border-radius: 2px;
+    background-color: rgba(249, 249, 249, 1);
+    padding: 1.5px 3px;
+    border-radius: 3px;
     svg {
-      font-size: ${props => (props.currentZoom >= 17 ? "30px" : "25px")};
+      font-size: ${props => (props.currentZoom >= 16 ? "30px" : "25px")};
       cursor: pointer;
       color: ${props => props.statusColor};
     }
@@ -52,34 +55,39 @@ const StoreDetail = styled.div<{ statusColor: string }>`
   display: flex;
   flex-direction: column;
   color: white;
-  font-size: 13px;
   padding: 10px;
   z-index: 1;
   overflow-x: hidden;
   overflow-y: auto;
   @media (max-width: 1023px) {
-    width: 175px;
-    height: 170px;
-    top: -175px;
-    left: -75px;
+    width: 200px;
+    height: 180px;
+    top: -190px;
+    left: -80px;
     font-size: 11px;
   }
   h3 {
     font-size: 18px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     font-weight: bold;
     @media (max-width: 1023px) {
       font-size: 14px;
     }
   }
   p {
+    font-size: 12px;
     margin-bottom: 20px;
     @media (max-width: 1023px) {
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
   }
   span {
+    font-size: 13px;
     font-weight: bold;
+    margin-bottom: 1px;
+    :last-of-type {
+      margin-bottom: 0;
+    }
     > span {
       background-color: ${props => props.statusColor};
     }
@@ -122,11 +130,14 @@ const Store: React.FC<TStoreProps> = ({
           <h3>{storeData.name}</h3>
           <p>{storeData.addr}</p>
           <span>
-            {"재고현황: "}
+            {"재고 현황: "}
             <span>{convertRemainStatusText(storeData.remain_stat)}</span>
           </span>
           {storeData.stock_at && (
-            <span>{`입고시간: ${storeData.stock_at}`}</span>
+            <span>{`최근 입고 시간: ${storeData.stock_at.substring(
+              2,
+              16
+            )}`}</span>
           )}
         </StoreDetail>
       )}

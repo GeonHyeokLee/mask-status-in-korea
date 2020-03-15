@@ -3,12 +3,14 @@ import GoogleMapReact from "google-map-react";
 import Store from "./Store";
 import styled from "styled-components";
 import Information from "./Information";
-import Notice from "./Notice";
+import Caution from "./Caution";
 import MyLocationButton from "./MyLocationButton";
-import { GOOGLE_MAP_API } from "./dotenv";
+import { GOOGLE_MAP_API } from "../dotenv";
 import AddressBar from "./AddressBar";
-import { geoCode } from "./utils";
+import { geoCode } from "../utils/geoCode";
 import RefreshButton from "./RefreshButton";
+import NoticeButton from "./NoticeButton";
+import Notice from "./Notice";
 
 type TMapProps = {
   setRefreshLoading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,6 +40,18 @@ type TMapProps = {
   storeList: any;
 };
 
+const Container = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  div.dummyContainer {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
 const UtilWrap = styled.div`
   position: fixed;
   top: 0;
@@ -46,6 +60,9 @@ const UtilWrap = styled.div`
   display: flex;
   flex-direction: column;
   z-index: 99;
+  @media (max-width: 1023px) {
+    margin: 10px;
+  }
   > div.util-button-wrap {
     display: flex;
     flex-direction: raw;
@@ -74,20 +91,25 @@ const UtilWrap = styled.div`
       }
     }
   }
+`;
+
+const InformationWrap = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 99;
   @media (max-width: 1023px) {
     margin: 10px;
   }
-`;
-
-const Container = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  div.dummyContainer {
-    width: 100%;
-    height: 100%;
+  > div:nth-child(1) {
+    margin-bottom: 20px;
+    @media (max-width: 1023px) {
+      margin-bottom: 10px;
+    }
   }
 `;
 
@@ -104,6 +126,7 @@ const Map: React.FC<TMapProps> = ({
   const [currentClickStore, setCurrentClickStore] = useState<number>();
   const [currentZoom, setCurrentZoom] = useState<number>(16);
   const [address, setAddress] = useState<string>("");
+  const [toggleNotice, setToggleNotice] = useState<boolean>(false);
 
   const initialEvent = useCallback(
     (hover: boolean = true, click: boolean = true) => {
@@ -158,7 +181,7 @@ const Map: React.FC<TMapProps> = ({
       } else {
         setCurrentClickStore(code);
       }
-      setCurrentZoom(17);
+      setCurrentZoom(16);
     },
     [currentClickStore, initialEvent, setCurrentLocation]
   );
@@ -170,7 +193,7 @@ const Map: React.FC<TMapProps> = ({
       lat: myLocation?.lat,
       lng: myLocation?.lng
     }));
-    setCurrentZoom(17);
+    setCurrentZoom(16);
   }, [initialEvent, myLocation, setCurrentLocation]);
 
   const onSubmitAddress = useCallback(
@@ -192,6 +215,11 @@ const Map: React.FC<TMapProps> = ({
       updateStoreData(currentLocation.lat, currentLocation.lng);
     }
   }, [currentLocation, updateStoreData]);
+
+  const onToggleNotice = useCallback((trigger: boolean) => {
+    setToggleNotice(trigger);
+  }, []);
+
   return (
     <>
       <Container>
@@ -222,7 +250,6 @@ const Map: React.FC<TMapProps> = ({
               />
             ))}
         </GoogleMapReact>
-        <Information />
         <UtilWrap>
           <AddressBar
             onSubmitAddress={onSubmitAddress}
@@ -237,8 +264,13 @@ const Map: React.FC<TMapProps> = ({
             />
           </div>
         </UtilWrap>
-        {currentZoom < 13 && <Notice />}
+        <InformationWrap>
+          <NoticeButton onToggleNotice={onToggleNotice} />
+          <Information />
+        </InformationWrap>
       </Container>
+      {currentZoom < 13 && <Caution />}
+      {toggleNotice && <Notice onToggleNotice={onToggleNotice} />}
     </>
   );
 };

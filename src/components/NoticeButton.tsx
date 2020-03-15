@@ -1,48 +1,44 @@
 import React from "react";
 import styled from "styled-components";
-import { color } from "./initialStyles";
+import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
+import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 
-type TMyLocationButtonProps = {
-  onMoveMyLocation: () => void;
+type TNoticeButtonProps = {
+  onToggleNotice: (trigger: boolean) => void;
 };
 
 const Container = styled.div`
-  display: flex;
+  width: 64px;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.7);
   font-size: 15px;
   font-weight: bold;
+  display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 3px;
   padding: 20px;
   @media (max-width: 1023px) {
+    width: 36px;
     font-size: 11px;
     padding: 10px;
   }
   svg {
     font-size: 24px;
     color: ${color.white};
-    transition: all 0.2s;
-    :hover {
-      color: ${color.green};
-    }
     @media (max-width: 1023px) {
       font-size: 16px;
     }
   }
 `;
 
-const MyLocationButton: React.FC<TMyLocationButtonProps> = ({
-  onMoveMyLocation
-}) => {
+const NoticeButton: React.FC<TNoticeButtonProps> = ({ onToggleNotice }) => {
   return (
-    <Container onClick={onMoveMyLocation}>
-      <FontAwesomeIcon icon={faCrosshairs} />
+    <Container onClick={() => onToggleNotice(true)}>
+      <FontAwesomeIcon icon={faExclamation} />
     </Container>
   );
 };
 
-export default MyLocationButton;
+export default React.memo(NoticeButton);

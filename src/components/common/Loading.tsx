@@ -2,7 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { color } from "./initialStyles";
+import { color } from "../../styles/colors";
 
 const Container = styled.div<{ noneBackground: boolean }>`
   position: fixed;

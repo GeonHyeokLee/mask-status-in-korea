@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from "react";
 import styled from "styled-components";
-import { color } from "./initialStyles";
+import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearchLocation } from "@fortawesome/free-solid-svg-icons";
 
@@ -27,11 +27,13 @@ const Container = styled.div`
     input {
       background-color: rgba(0, 0, 0, 0.6);
       border: none;
+      flex-shrink: 1;
       width: 100%;
       height: 100%;
       padding: 20px 10px;
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
+      border-radius: 3px 0px 0px 3px;
+      -webkit-border-radius: 3px 0px 0px 3px;
+      -moz-border-radius: 3px 0px 0px 3px;
       color: ${color.white};
       font-size: 14px;
       :focus {
@@ -49,12 +51,14 @@ const Container = styled.div`
       }
     }
     button {
-      width: 50px;
+      flex-shrink: 0;
+      width: 55px;
       height: 100%;
       border: none;
       background-color: rgba(0, 0, 0, 0.75);
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
+      border-radius: 0px 3px 3px 0px;
+      -webkit-border-radius: 0px 3px 3px 0px;
+      -moz-border-radius: 0px 3px 3px 0px;
       color: ${color.white};
       cursor: pointer;
       transition: all 0.2s;
@@ -63,6 +67,15 @@ const Container = styled.div`
       }
       :hover {
         color: ${color.green};
+      }
+      @media (max-width: 1023px) {
+        width: 40px;
+      }
+      svg {
+        font-size: 15px;
+        @media (max-width: 1023px) {
+          font-size: 12px;
+        }
       }
     }
   }

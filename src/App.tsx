@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import Map from "./Map";
-import { InitialStyle } from "./initialStyles";
+import Map from "./components/Map";
+import { InitialStyle } from "./styles/initialStyles";
 import styled from "styled-components";
-import Loading from "./Loading";
+import Loading from "./components/common/Loading";
 
 const Container = styled.div`
   position: relative;
@@ -33,8 +33,10 @@ function App() {
       .then(data => setStoreList(data.stores))
       .finally(() => {
         setTimeout(() => {
-          setMapLoading(false);
           setRefreshLoading(false);
+        }, 1000);
+        setTimeout(() => {
+          setMapLoading(false);
         }, 1500);
       });
   }, []);
