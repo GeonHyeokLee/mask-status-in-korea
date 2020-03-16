@@ -75,6 +75,11 @@ function App() {
       lat: INITIAL_COORDS.lat,
       lng: INITIAL_COORDS.lng
     }));
+    setMyLocation(prev => ({
+      ...prev,
+      lat: INITIAL_COORDS.lat,
+      lng: INITIAL_COORDS.lng
+    }));
     updateStoreData(INITIAL_COORDS.lat, INITIAL_COORDS.lng, currentZoom);
   }, [currentZoom, updateStoreData]);
 

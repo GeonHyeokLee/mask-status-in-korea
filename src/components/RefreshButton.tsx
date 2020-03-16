@@ -8,8 +8,6 @@ const Container = styled.div`
   width: 64px;
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.7);
-  font-size: 15px;
-  font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;

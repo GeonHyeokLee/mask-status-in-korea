@@ -11,6 +11,7 @@ import { geoCode } from "../utils/geoCode";
 import RefreshButton from "./RefreshButton";
 import NoticeButton from "./NoticeButton";
 import Notice from "./Notice";
+import LocationStorage from "./LocationStorage";
 
 type TMapProps = {
   currentLocation:
@@ -192,16 +193,18 @@ const Map: React.FC<TMapProps> = ({
     [currentClickStore, initialEvent, setCurrentLocation, setCurrentZoom]
   );
 
-  const onMoveMyLocation = useCallback(() => {
-    initialEvent();
-    if (!myLocation) return;
-    setCurrentLocation(prev => ({
-      ...prev,
-      lat: myLocation.lat,
-      lng: myLocation.lng
-    }));
-    setCurrentZoom(16);
-  }, [initialEvent, myLocation, setCurrentLocation, setCurrentZoom]);
+  const onMoveLocation = useCallback(
+    (lat: number, lng: number) => {
+      initialEvent();
+      setCurrentLocation(prev => ({
+        ...prev,
+        lat,
+        lng
+      }));
+      setCurrentZoom(16);
+    },
+    [initialEvent, setCurrentLocation, setCurrentZoom]
+  );
 
   const onSubmitAddress = useCallback(
     async (address: string) => {
@@ -264,12 +267,22 @@ const Map: React.FC<TMapProps> = ({
             setAddress={setAddress}
           />
           <div className="util-button-wrap">
-            <MyLocationButton onMoveMyLocation={onMoveMyLocation} />
+            {myLocation && (
+              <MyLocationButton
+                onMoveMyLocation={() =>
+                  onMoveLocation(myLocation?.lat, myLocation?.lng)
+                }
+              />
+            )}
             <RefreshButton
               onRefreshStoreData={onRefreshStoreData}
               spin={refreshLoading ? true : false}
             />
           </div>
+          <LocationStorage
+            onMoveLocation={onMoveLocation}
+            currentLocation={currentLocation}
+          />
         </UtilWrap>
         <InformationWrap>
           <NoticeButton onToggleNotice={onToggleNotice} />
