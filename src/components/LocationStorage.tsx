@@ -25,7 +25,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
     :nth-of-type(2) {
-      margin-top: 10px;
+      margin-top: 30px;
       display: flex;
       flex-direction: column;
     }
@@ -73,15 +73,15 @@ const Guide = styled.div`
   left: 95px;
   width: 200px;
   height: 70px;
-  border-radius: 0px 50px 50px 50px;
+  border-radius: 0px 70px 70px 70px;
   background-color: rgba(0, 0, 0, 0.6);
   padding: 15px 10px;
   @media (max-width: 1023px) {
     top: 10px;
     left: 60px;
-    width: 120px;
-    height: 60px;
-    padding: 12px 7px;
+    width: 130px;
+    height: 50px;
+    padding: 10px 7px;
   }
   span {
     font-size: 14px;
