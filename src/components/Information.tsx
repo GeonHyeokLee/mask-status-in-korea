@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFirstAid } from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { color } from "../styles/colors";
 
 const Container = styled.div`
@@ -10,7 +10,7 @@ const Container = styled.div`
   width: 330px;
   height: 260px;
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.55);
   color: #eaeaea;
   flex-direction: column;
   justify-content: space-between;
@@ -33,10 +33,11 @@ const Container = styled.div`
           font-size: 13px;
         }
       }
+
       svg {
-        font-size: 19px;
+        font-size: 21px;
         @media (max-width: 1023px) {
-          font-size: 15px;
+          font-size: 17px;
         }
       }
     }
@@ -68,28 +69,28 @@ const Information: React.FC = () => {
       <ul>
         <li>
           <p>100개 이상 </p>
-          <FontAwesomeIcon icon={faFirstAid} color={color.green} />
+          <FontAwesomeIcon icon={faPlusCircle} color={color.green} />
         </li>
         <li>
           <p>30개 이상 100개 미만</p>
-          <FontAwesomeIcon icon={faFirstAid} color={color.yellow} />
+          <FontAwesomeIcon icon={faPlusCircle} color={color.yellow} />
         </li>
         <li>
           <p>2개 이상 30개 미만</p>
-          <FontAwesomeIcon icon={faFirstAid} color={color.red} />
+          <FontAwesomeIcon icon={faPlusCircle} color={color.red} />
         </li>
         <li>
           <p>1개 이하 또는 재고 소진</p>
-          <FontAwesomeIcon icon={faFirstAid} color={color.black} />
+          <FontAwesomeIcon icon={faPlusCircle} color={color.black} />
         </li>
       </ul>
       <div>
         <h3>
-          <b>반경 2km이내</b>의 약국을 볼 수 있어요
+          <b>최대 2km이내</b>의 약국을 볼 수 있어요
         </h3>
         <h3>
           <span role="img" aria-label="notice">
-            데스크탑, 모바일 모두 지원해요!😁
+            데스크탑, 모바일 모두 지원해요 😁
           </span>
         </h3>
       </div>

@@ -19,6 +19,24 @@ const Container = styled.div`
   align-items: center;
   border-radius: 3px;
   padding: 20px;
+  animation: identifier 8s infinite;
+  @keyframes identifier {
+    0% {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    35% {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    50% {
+      background-color: rgba(0, 184, 148, 1);
+    }
+    65% {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+    100% {
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+  }
   @media (max-width: 1023px) {
     width: 36px;
     font-size: 11px;

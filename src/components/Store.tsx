@@ -1,10 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFirstAid } from "@fortawesome/free-solid-svg-icons";
+import {
+  // faFirstAid,
+  // faPlusSquare,
+  faPlusCircle
+} from "@fortawesome/free-solid-svg-icons";
 import {
   convertRemainStatusText,
-  convertRemainStatusColor
+  convertRemainStatusColor,
+  convertRemainStatusBoolean
 } from "../utils/convertRemainStatus";
 
 type TStoreProps = {
@@ -27,11 +32,11 @@ const Container = styled.div<{ currentZoom: number; statusColor: string }>`
   justify-content: center;
   align-items: center;
   div.svgWrap {
-    background-color: rgba(249, 249, 249, 1);
-    padding: 1.5px 3px;
-    border-radius: 3px;
+    background-color: #f5f5f5;
+    padding: 1.5px;
+    border-radius: 100%;
     svg {
-      font-size: ${props => (props.currentZoom >= 16 ? "30px" : "25px")};
+      font-size: ${props => (props.currentZoom >= 16 ? "30px" : "22.5px")};
       cursor: pointer;
       color: ${props => props.statusColor};
     }
@@ -119,10 +124,16 @@ const Store: React.FC<TStoreProps> = ({
           onClickStore(storeData.lat, storeData.lng, storeData.code)
         }
       >
-        <FontAwesomeIcon icon={faFirstAid} />
+        <FontAwesomeIcon icon={faPlusCircle} />
       </div>
 
-      <h3 className="store-name">{currentZoom >= 15 && storeData.name}</h3>
+      <h3 className="store-name">
+        {currentZoom > 15
+          ? storeData.name
+          : currentZoom === 15 &&
+            convertRemainStatusBoolean(storeData.remain_stat) &&
+            storeData.name}
+      </h3>
       {(onCurrentHover || onCurrentClick) && (
         <StoreDetail
           statusColor={convertRemainStatusColor(storeData.remain_stat)}

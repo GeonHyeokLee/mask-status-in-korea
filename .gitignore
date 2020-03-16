@@ -1,6 +1,7 @@
 # Etc
 dotenv.ts
 build
+development
 
 # dependencies
 /node_modules

@@ -13,8 +13,6 @@ import NoticeButton from "./NoticeButton";
 import Notice from "./Notice";
 
 type TMapProps = {
-  setRefreshLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  refreshLoading: boolean;
   currentLocation:
     | {
         lat: number;
@@ -36,8 +34,12 @@ type TMapProps = {
         lng: number;
       }
     | undefined;
-  updateStoreData: (lat: number, lng: number) => void;
+  updateStoreData: (lat: number, lng: number, currentZoom: number) => void;
   storeList: any;
+  setRefreshLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  refreshLoading: boolean;
+  currentZoom: number;
+  setCurrentZoom: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const Container = styled.div`
@@ -120,11 +122,12 @@ const Map: React.FC<TMapProps> = ({
   storeList,
   updateStoreData,
   refreshLoading,
-  setRefreshLoading
+  setRefreshLoading,
+  currentZoom,
+  setCurrentZoom
 }) => {
   const [currentHoverStore, setCurrentHoverStore] = useState<number>();
   const [currentClickStore, setCurrentClickStore] = useState<number>();
-  const [currentZoom, setCurrentZoom] = useState<number>(16);
   const [address, setAddress] = useState<string>("");
   const [toggleNotice, setToggleNotice] = useState<boolean>(false);
 
@@ -159,14 +162,17 @@ const Map: React.FC<TMapProps> = ({
         lat: center.lat,
         lng: center.lng
       }));
-      updateStoreData(center.lat, center.lng);
+      updateStoreData(center.lat, center.lng, currentZoom);
     },
-    [setCurrentLocation, updateStoreData]
+    [currentZoom, setCurrentLocation, updateStoreData]
   );
 
-  const onZoomAnimationEnd = useCallback((currentZoom: number) => {
-    setCurrentZoom(currentZoom);
-  }, []);
+  const onZoomAnimationEnd = useCallback(
+    (zoom: number) => {
+      setCurrentZoom(zoom);
+    },
+    [setCurrentZoom]
+  );
 
   const onClickStore = useCallback(
     (lat: number, lng: number, code: number) => {
@@ -183,18 +189,19 @@ const Map: React.FC<TMapProps> = ({
       }
       setCurrentZoom(16);
     },
-    [currentClickStore, initialEvent, setCurrentLocation]
+    [currentClickStore, initialEvent, setCurrentLocation, setCurrentZoom]
   );
 
   const onMoveMyLocation = useCallback(() => {
     initialEvent();
-    setCurrentLocation((prev: any) => ({
+    if (!myLocation) return;
+    setCurrentLocation(prev => ({
       ...prev,
-      lat: myLocation?.lat,
-      lng: myLocation?.lng
+      lat: myLocation.lat,
+      lng: myLocation.lng
     }));
     setCurrentZoom(16);
-  }, [initialEvent, myLocation, setCurrentLocation]);
+  }, [initialEvent, myLocation, setCurrentLocation, setCurrentZoom]);
 
   const onSubmitAddress = useCallback(
     async (address: string) => {
@@ -207,14 +214,14 @@ const Map: React.FC<TMapProps> = ({
       setCurrentZoom(16);
       setAddress("");
     },
-    [setCurrentLocation]
+    [setCurrentLocation, setCurrentZoom]
   );
 
   const onRefreshStoreData = useCallback(() => {
     if (currentLocation) {
-      updateStoreData(currentLocation.lat, currentLocation.lng);
+      updateStoreData(currentLocation.lat, currentLocation.lng, currentZoom);
     }
-  }, [currentLocation, updateStoreData]);
+  }, [currentLocation, currentZoom, updateStoreData]);
 
   const onToggleNotice = useCallback((trigger: boolean) => {
     setToggleNotice(trigger);

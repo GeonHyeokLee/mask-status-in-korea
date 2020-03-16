@@ -1,5 +1,22 @@
 import { color } from "../styles/colors";
 
+export const convertRemainStatusBoolean = (status: string | null) => {
+  switch (status) {
+    case "break":
+      return false;
+    case "empty":
+      return false;
+    case "few":
+      return true;
+    case "some":
+      return true;
+    case "plenty":
+      return true;
+    default:
+      return false;
+  }
+};
+
 export const convertRemainStatusText = (status: string | null) => {
   switch (status) {
     case "break":
