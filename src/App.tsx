@@ -26,26 +26,27 @@ function App() {
   const [currentZoom, setCurrentZoom] = useState<number>(16);
 
   const updateStoreData = useCallback(
-    (lat: number, lng: number, currentZoom: number) => {
+    async (lat: number, lng: number, currentZoom: number) => {
       setRefreshLoading(true);
-      const result = fetch(
-        `https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=${lat}&lng=${lng}&m=${manageBoundary(
-          currentZoom
-        )}`
-      );
-      result
-        .then(res => res.json())
-        .then(data => setStoreList(data.stores))
-        .finally(() => {
-          setTimeout(() => {
-            setRefreshLoading(false);
-          }, 1000);
-          setTimeout(() => {
-            setMapLoading(false);
-          }, 1500);
-        });
+
+      const url = `https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=${lat}&lng=${lng}&m=${manageBoundary(
+        currentZoom
+      )}`;
+      const result = await fetch(url);
+      const resultToJson = await result.json();
+      setStoreList(resultToJson.stores);
+
+      setTimeout(() => {
+        setRefreshLoading(false);
+      }, 1000);
+
+      if (mapLoading) {
+        setTimeout(() => {
+          setMapLoading(false);
+        }, 1500);
+      }
     },
-    []
+    [mapLoading]
   );
 
   const successGetCurrentPosition = useCallback(

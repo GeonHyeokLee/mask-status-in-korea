@@ -2,9 +2,10 @@
 dotenv.ts
 build
 src/development
-src/utils
 development
-utils
+source
+*.dev.tsx
+*.dev.ts
 
 # dependencies
 /node_modules
