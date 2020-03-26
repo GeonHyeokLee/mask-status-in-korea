@@ -5,17 +5,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 
 const Container = styled.div`
-  width: 64px;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 3px;
+  width: 64px;
   padding: 20px;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.7);
+  cursor: pointer;
   @media (max-width: 1023px) {
     width: 36px;
-    font-size: 11px;
+    height: 36px;
     padding: 10px;
   }
   svg {

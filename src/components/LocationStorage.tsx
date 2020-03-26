@@ -25,7 +25,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: row;
     :nth-of-type(2) {
-      margin-top: 30px;
+      margin-top: 10px;
       display: flex;
       flex-direction: column;
     }
@@ -66,33 +66,6 @@ const Container = styled.div`
   }
 `;
 
-const Guide = styled.div`
-  cursor: pointer;
-  position: absolute;
-  top: 16px;
-  left: 95px;
-  width: 200px;
-  height: 70px;
-  border-radius: 0px 70px 70px 70px;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 15px 10px;
-  @media (max-width: 1023px) {
-    top: 10px;
-    left: 60px;
-    width: 130px;
-    height: 50px;
-    padding: 10px 7px;
-  }
-  span {
-    font-size: 14px;
-    line-height: 1.4;
-    color: ${color.white};
-    @media (max-width: 1023px) {
-      font-size: 10px;
-    }
-  }
-`;
-
 const LocationStorage: React.FC<TLocationStorageProps> = ({
   onMoveLocation,
   currentLocation
@@ -103,11 +76,10 @@ const LocationStorage: React.FC<TLocationStorageProps> = ({
       lng: number;
     }[]
   >([]);
-  const [guide, setGuide] = useState<boolean>(true);
 
   const saveNewLocationData = useCallback(
     (lat: number, lng: number) => {
-      if (locationData.length <= 2) {
+      if (locationData.length <= 1) {
         const newData = [...locationData, { lat, lng }];
         postLocationData(newData);
         setLocationData(newData);
@@ -162,11 +134,6 @@ const LocationStorage: React.FC<TLocationStorageProps> = ({
             </div>
           ))}
       </div>
-      {guide && (
-        <Guide onClick={() => setGuide(false)}>
-          <span>최대 3개까지 위치를 저장할 수 있게 되었어요!</span>
-        </Guide>
-      )}
     </Container>
   );
 };

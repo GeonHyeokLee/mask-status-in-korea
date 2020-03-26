@@ -1,27 +1,24 @@
 import React from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  // faFirstAid,
-  // faPlusSquare,
-  faPlusCircle
-} from "@fortawesome/free-solid-svg-icons";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import {
   convertRemainStatusText,
   convertRemainStatusColor,
   convertRemainStatusBoolean
 } from "../utils/convertRemainStatus";
+import { TStoreData } from "../types";
 
 type TStoreProps = {
   key: any;
   lat: any;
   lng: any;
   currentZoom: number;
-  storeData: any;
+  storeData: TStoreData;
   onCurrentHover: boolean;
   onCurrentClick: boolean;
-  onMouseOverStore: (code: number) => void;
-  onClickStore: (lat: number, lng: number, code: number) => void;
+  onMouseOverStore: (code: string) => void;
+  onClickStore: (lat: number, lng: number, code: string) => void;
   initialEvent: (hover?: boolean, click?: boolean) => void;
 };
 

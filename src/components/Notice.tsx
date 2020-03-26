@@ -132,6 +132,10 @@ const Notice: React.FC<TNoticeProps> = ({ onToggleNotice }) => {
             <h4>버전 0.3.0</h4>
             <span>성능 최적화, 아이콘 수정, 공지사항 추가</span>
           </div>
+          <div>
+            <h4>버전 0.4.0</h4>
+            <span>필터링 추가</span>
+          </div>
         </li>
         <li>
           <span>

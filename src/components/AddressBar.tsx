@@ -72,9 +72,9 @@ const Container = styled.div`
         width: 40px;
       }
       svg {
-        font-size: 15px;
+        font-size: 20px;
         @media (max-width: 1023px) {
-          font-size: 12px;
+          font-size: 15px;
         }
       }
     }

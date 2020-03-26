@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
 
 type TMyLocationButtonProps = {
-  onMoveMyLocation: () => void;
+  onMoveMyLocation?: () => void;
 };
 
 const Container = styled.div`
@@ -21,6 +21,7 @@ const Container = styled.div`
   padding: 20px;
   @media (max-width: 1023px) {
     width: 36px;
+    height: 36px;
     font-size: 11px;
     padding: 10px;
   }

@@ -5,13 +5,17 @@ import styled from "styled-components";
 import Information from "./Information";
 import Caution from "./Caution";
 import MyLocationButton from "./MyLocationButton";
-import { GOOGLE_MAP_API } from "../dotenv";
 import AddressBar from "./AddressBar";
 import { geoCode } from "../utils/geoCode";
 import RefreshButton from "./RefreshButton";
 import NoticeButton from "./NoticeButton";
 import Notice from "./Notice";
 import LocationStorage from "./LocationStorage";
+import { GOOGLE_MAP_API, isDev } from "../dotenv";
+import { TStoreData } from "../types";
+import { convertRemainStatusBoolean } from "../utils/convertRemainStatus";
+import OnlyAvailableStoreButton from "./OnlyAvailableStoreButton";
+import { color } from "../styles/colors";
 
 type TMapProps = {
   currentLocation:
@@ -67,8 +71,34 @@ const UtilWrap = styled.div`
     margin: 10px;
   }
   > div.util-button-wrap {
+    position: relative;
     display: flex;
     flex-direction: raw;
+    > div.bubble-message {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      top: 32px;
+      right: -95px;
+      height: 40px;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 0 40px 40px 40px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: ${color.white};
+      @media (max-width: 1023px) {
+        top: 16px;
+        right: -65px;
+        height: 35px;
+        font-size: 11px;
+      }
+      > span {
+        color: ${color.yellow};
+        margin-right: 10px;
+      }
+    }
     > div {
       margin-right: 20px;
       :last-of-type {
@@ -127,25 +157,26 @@ const Map: React.FC<TMapProps> = ({
   currentZoom,
   setCurrentZoom
 }) => {
-  const [currentHoverStore, setCurrentHoverStore] = useState<number>();
-  const [currentClickStore, setCurrentClickStore] = useState<number>();
+  const [currentHoverStore, setCurrentHoverStore] = useState<string>();
+  const [currentClickStore, setCurrentClickStore] = useState<string>();
   const [address, setAddress] = useState<string>("");
   const [toggleNotice, setToggleNotice] = useState<boolean>(false);
+  const [onlyAvailableStore, setOnlyAvailableStore] = useState<boolean>(false);
 
   const initialEvent = useCallback(
     (hover: boolean = true, click: boolean = true) => {
       if (hover) {
-        setCurrentHoverStore(-999999);
+        setCurrentHoverStore("-999999");
       }
       if (click) {
-        setCurrentClickStore(-999999);
+        setCurrentClickStore("-999999");
       }
     },
     []
   );
 
   const onMouseOverStore = useCallback(
-    (code: number) => {
+    (code: string) => {
       if (code !== currentClickStore) {
         initialEvent(false);
       } else {
@@ -176,7 +207,7 @@ const Map: React.FC<TMapProps> = ({
   );
 
   const onClickStore = useCallback(
-    (lat: number, lng: number, code: number) => {
+    (lat: number, lng: number, code: string) => {
       initialEvent();
       setCurrentLocation(prev => ({
         ...prev,
@@ -184,13 +215,21 @@ const Map: React.FC<TMapProps> = ({
         lng
       }));
       if (currentClickStore === code) {
-        setCurrentClickStore(-999999);
+        setCurrentClickStore("-999999");
       } else {
         setCurrentClickStore(code);
       }
-      setCurrentZoom(16);
+      if (currentZoom <= 16) {
+        setCurrentZoom(16);
+      }
     },
-    [currentClickStore, initialEvent, setCurrentLocation, setCurrentZoom]
+    [
+      currentClickStore,
+      currentZoom,
+      initialEvent,
+      setCurrentLocation,
+      setCurrentZoom
+    ]
   );
 
   const onMoveLocation = useCallback(
@@ -234,7 +273,7 @@ const Map: React.FC<TMapProps> = ({
     <>
       <Container>
         <GoogleMapReact
-          bootstrapURLKeys={{ key: GOOGLE_MAP_API }}
+          bootstrapURLKeys={{ key: `${isDev ? "" : GOOGLE_MAP_API}` }}
           center={currentLocation}
           zoom={currentZoom}
           onChange={onChangeMap}
@@ -245,20 +284,53 @@ const Map: React.FC<TMapProps> = ({
         >
           {storeList &&
             currentZoom >= 13 &&
-            storeList.map((store: any) => (
-              <Store
-                key={store.code}
-                lat={store.lat}
-                lng={store.lng}
-                currentZoom={currentZoom}
-                storeData={store}
-                onCurrentHover={store.code !== currentHoverStore ? false : true}
-                onCurrentClick={store.code !== currentClickStore ? false : true}
-                onMouseOverStore={onMouseOverStore}
-                initialEvent={initialEvent}
-                onClickStore={onClickStore}
-              />
-            ))}
+            // eslint-disable-next-line array-callback-return
+            storeList.map((store: TStoreData) => {
+              const remainStatus = convertRemainStatusBoolean(
+                store.remain_stat
+              );
+              if (onlyAvailableStore) {
+                if (remainStatus) {
+                  return (
+                    <Store
+                      key={store.code}
+                      lat={store.lat}
+                      lng={store.lng}
+                      currentZoom={currentZoom}
+                      storeData={store}
+                      onCurrentHover={
+                        store.code !== currentHoverStore ? false : true
+                      }
+                      onCurrentClick={
+                        store.code !== currentClickStore ? false : true
+                      }
+                      onMouseOverStore={onMouseOverStore}
+                      initialEvent={initialEvent}
+                      onClickStore={onClickStore}
+                    />
+                  );
+                }
+              } else {
+                return (
+                  <Store
+                    key={store.code}
+                    lat={store.lat}
+                    lng={store.lng}
+                    currentZoom={currentZoom}
+                    storeData={store}
+                    onCurrentHover={
+                      store.code !== currentHoverStore ? false : true
+                    }
+                    onCurrentClick={
+                      store.code !== currentClickStore ? false : true
+                    }
+                    onMouseOverStore={onMouseOverStore}
+                    initialEvent={initialEvent}
+                    onClickStore={onClickStore}
+                  />
+                );
+              }
+            })}
         </GoogleMapReact>
         <UtilWrap>
           <AddressBar
@@ -274,10 +346,18 @@ const Map: React.FC<TMapProps> = ({
                 }
               />
             )}
+            {!myLocation && <MyLocationButton />}
             <RefreshButton
               onRefreshStoreData={onRefreshStoreData}
               spin={refreshLoading ? true : false}
             />
+            <OnlyAvailableStoreButton
+              onlyAvailableStore={onlyAvailableStore}
+              setOnlyAvailableStore={setOnlyAvailableStore}
+            />
+            <div className="bubble-message">
+              <span>NEW</span> 재고있는 약국만 보기
+            </div>
           </div>
           <LocationStorage
             onMoveLocation={onMoveLocation}
