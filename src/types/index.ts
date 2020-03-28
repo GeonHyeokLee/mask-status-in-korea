@@ -1,18 +1,4 @@
-// utils
-export type TGeoCode = (address: string) => Promise<{
-  address: any;
-  lat: any;
-  lng: any;
-}>
-export type TReverseGeoCode = (lat: number, lng: number) => Promise<{
-  address: any;
-}>
-
-export type TGetLocationData = () => TLocationData | undefined
-export type TPostLocationData = (locationData: TLocationData) => void
-
-
-// App.tsx
+// reducer
 export type TStoreData = {
   addr: string;
   code: string;
@@ -37,20 +23,21 @@ export type TMyLocation = {
 } | undefined;
 export type TCurrentZoom = number;
 
-export type TSetStoreList = React.Dispatch<TStoreData[]>;
-export type TSetMapLoading = React.Dispatch<TMapLoading>;
-export type TSetRefreshLoading = React.Dispatch<TRefreshLoading>;
-export type TSetCurrentLocation = React.Dispatch<
-  React.SetStateAction<
-    TCurrentLocation
-  >
->;
-export type TSetMyLocation = React.Dispatch<
-  React.SetStateAction<
-    TMyLocation
-  >
->;
-export type TSetCurrentZoom = React.Dispatch<React.SetStateAction<TCurrentZoom>>;
+// utils
+export type TGeoCode = (address: string) => Promise<{
+  address: any;
+  lat: any;
+  lng: any;
+}>
+export type TReverseGeoCode = (lat: number, lng: number) => Promise<{
+  address: any;
+}>
+
+export type TGetLocationData = () => TLocationData | undefined
+export type TPostLocationData = (locationData: TLocationData) => void
+
+
+// App.tsx
 export type TSuccessGetCurrentPositionCallbackData = {
   coords: {
     latitude: number;
@@ -61,18 +48,6 @@ export type TSuccessGetCurrentPositionCallbackData = {
 export type TUpdateStoreData = Promise<(lat: number, lng: number) => Promise<void>>;
 
 // Map.tsx
-export type TMapComponentProps = {
-  currentLocation: TCurrentLocation;
-  myLocation: TMyLocation
-  refreshLoading: TRefreshLoading;
-  currentZoom: TCurrentZoom;
-  setCurrentLocation: TSetCurrentLocation
-  updateStoreData: TUpdateStoreData;
-  storeList: TStoreListData;
-  setRefreshLoading: TSetRefreshLoading;
-  setCurrentZoom: TSetCurrentZoom;
-};
-
 export type TCurrentHoverStore = string;
 export type TCurrentClickStore = string;
 export type TAddress = string;

@@ -86,7 +86,7 @@ const AddressBar: React.FC<TAddressBarComponentProps> = ({
   address,
   setAddress
 }) => {
-  const ref = useRef<any>(null);
+  const ref = useRef<HTMLButtonElement>(null);
 
   const onChangeInputProcess = useCallback((setAddress: TSetAddress) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {

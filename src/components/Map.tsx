@@ -14,13 +14,10 @@ import LocationStorage from "./LocationStorage";
 import { GOOGLE_MAP_API, isDev } from "../dotenv";
 import {
   TStoreData,
-  TMapComponentProps,
   TSetCurrentClickStore,
   TSetCurrentHoverStore,
   TInitEvent,
-  TSetCurrentLocation,
   TUpdateStoreData,
-  TSetCurrentZoom,
   TGeoCode,
   TSetAddress,
   TCurrentLocation,
@@ -34,6 +31,9 @@ import {
 import { convertRemainStatusBoolean } from "../utils/convertRemainStatus";
 import OnlyAvailableStoreButton from "./OnlyAvailableStoreButton";
 import { color } from "../styles/colors";
+import { useSelector, useDispatch } from "../hooks/useRedux";
+import { useStoreData } from "../hooks/useStoreData";
+import { TGlobalAction } from "../modules/types";
 
 const Container = styled.div`
   position: absolute;
@@ -134,38 +134,31 @@ const InformationWrap = styled.div`
   }
 `;
 
-const Map: React.FC<TMapComponentProps> = ({
-  currentLocation,
-  setCurrentLocation,
-  myLocation,
-  storeList,
-  updateStoreData,
-  refreshLoading,
-  setRefreshLoading,
-  currentZoom,
-  setCurrentZoom
-}) => {
-  const [currentHoverStore, setCurrentHoverStore] = useState<
-    TCurrentHoverStore
-  >("");
-  const [currentClickStore, setCurrentClickStore] = useState<
-    TCurrentClickStore
-  >("");
+const Map: React.FC = () => {
+  const [currentHoverStore, setCurrentHoverStore] = useState<TCurrentHoverStore>("");
+  const [currentClickStore, setCurrentClickStore] = useState<TCurrentClickStore>("");
   const [address, setAddress] = useState<TAddress>("");
   const [toggleNotice, setToggleNotice] = useState<TToggleNotice>(false);
-  const [onlyAvailableStore, setOnlyAvailableStore] = useState<
-    TOnlyAvailableStore
-  >(false);
+  const [onlyAvailableStore, setOnlyAvailableStore] = useState<TOnlyAvailableStore>(
+    false
+  );
+
+  const {
+    storeList,
+    currentLocation,
+    currentZoom,
+    myLocation,
+    refreshLoading
+  } = useSelector();
+  const dispatch = useDispatch();
+  const { updateStoreData } = useStoreData();
 
   const initEventProcess = useCallback(
     (
       setCurrentHoverStore: TSetCurrentHoverStore,
       setCurrentClickStore: TSetCurrentClickStore
     ) => {
-      return (
-        initHoverTrigger: boolean = true,
-        initClickTrigger: boolean = true
-      ) => {
+      return (initHoverTrigger: boolean = true, initClickTrigger: boolean = true) => {
         const initialStoreCode: string = "-999999";
         if (initHoverTrigger) {
           setCurrentHoverStore(initialStoreCode);
@@ -208,120 +201,92 @@ const Map: React.FC<TMapComponentProps> = ({
   );
 
   const onChangeMapProcess = useCallback(
-    (
-      setCurrentLocation: TSetCurrentLocation,
-      updateStoreData: TUpdateStoreData
-    ) => {
+    (dispatch: React.Dispatch<TGlobalAction>, updateStoreData: TUpdateStoreData) => {
       return async (value: ChangeEventValue) => {
-        setCurrentLocation(prev => ({
-          ...prev,
-          lat: value.center.lat,
-          lng: value.center.lng
-        }));
+        dispatch({
+          type: "UPDATE_CURRENT_LOCATION",
+          payload: { lat: value.center.lat, lng: value.center.lng }
+        });
         (await updateStoreData)(value.center.lat, value.center.lng);
       };
     },
     []
   );
-  const onChangeMap = onChangeMapProcess(setCurrentLocation, updateStoreData);
+  const onChangeMap = onChangeMapProcess(dispatch, updateStoreData);
 
   const onZoomAnimationEndProcess = useCallback(
-    (setCurrentZoom: TSetCurrentZoom) => {
+    (dispatch: React.Dispatch<TGlobalAction>) => {
       return (zoom: number) => {
-        setCurrentZoom(zoom);
+        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: zoom });
       };
     },
     []
   );
-  const onZoomAnimationEnd = onZoomAnimationEndProcess(setCurrentZoom);
+  const onZoomAnimationEnd = onZoomAnimationEndProcess(dispatch);
 
   const onClickStoreProcess = useCallback(
     (
+      dispatch: React.Dispatch<TGlobalAction>,
       initEvent: TInitEvent,
-      setCurrentLocation: TSetCurrentLocation,
       setCurrentClickStore: TSetCurrentClickStore,
-      setCurrentZoom: TSetCurrentZoom,
       currentClickStore: string,
       currentZoom: number
     ) => {
       return (lat: number, lng: number, code: string) => {
         initEvent();
-        setCurrentLocation(prev => ({
-          ...prev,
-          lat,
-          lng
-        }));
+        dispatch({ type: "UPDATE_CURRENT_LOCATION", payload: { lat, lng } });
         if (currentClickStore === code) {
           setCurrentClickStore("-999999");
         } else {
           setCurrentClickStore(code);
         }
         if (currentZoom <= 16) {
-          setCurrentZoom(16);
+          dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
         }
       };
     },
     []
   );
+
   const onClickStore = onClickStoreProcess(
+    dispatch,
     initEvent,
-    setCurrentLocation,
     setCurrentClickStore,
-    setCurrentZoom,
     currentClickStore,
     currentZoom
   );
 
   const onMoveLocationProcess = useCallback(
-    (
-      initEvent: TInitEvent,
-      setCurrentLocation: TSetCurrentLocation,
-      setCurrentZoom: TSetCurrentZoom
-    ) => {
+    (dispatch: React.Dispatch<TGlobalAction>, initEvent: TInitEvent) => {
       return (lat: number, lng: number) => {
         initEvent();
-        setCurrentLocation(prev => ({
-          ...prev,
-          lat,
-          lng
-        }));
-        setCurrentZoom(16);
+        dispatch({ type: "UPDATE_CURRENT_LOCATION", payload: { lat, lng } });
+        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
       };
     },
     []
   );
-  const onMoveLocation = onMoveLocationProcess(
-    initEvent,
-    setCurrentLocation,
-    setCurrentZoom
-  );
+  const onMoveLocation = onMoveLocationProcess(dispatch, initEvent);
 
   const onSubmitAddressProcess = useCallback(
     (
+      dispatch: React.Dispatch<TGlobalAction>,
       geoCode: TGeoCode,
-      setCurrentLocation: TSetCurrentLocation,
-      setCurrentZoom: TSetCurrentZoom,
       setAddress: TSetAddress
     ) => {
       return async (address: string) => {
         const result = await geoCode(address);
-        setCurrentLocation(prev => ({
-          ...prev,
-          lat: result.lat,
-          lng: result.lng
-        }));
-        setCurrentZoom(16);
+        dispatch({
+          type: "UPDATE_CURRENT_LOCATION",
+          payload: { lat: result.lat, lng: result.lng }
+        });
+        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
         setAddress("");
       };
     },
     []
   );
-  const onSubmitAddress = onSubmitAddressProcess(
-    geoCode,
-    setCurrentLocation,
-    setCurrentZoom,
-    setAddress
-  );
+  const onSubmitAddress = onSubmitAddressProcess(dispatch, geoCode, setAddress);
 
   const onRefreshStoreDataProcess = useCallback(
     (currentLocation: TCurrentLocation, updateStoreData: TUpdateStoreData) => {
@@ -333,19 +298,13 @@ const Map: React.FC<TMapComponentProps> = ({
     },
     []
   );
-  const onRefreshStoreData = onRefreshStoreDataProcess(
-    currentLocation,
-    updateStoreData
-  );
+  const onRefreshStoreData = onRefreshStoreDataProcess(currentLocation, updateStoreData);
 
-  const onToggleNoticeProcess = useCallback(
-    (setToggleNotice: TSetToggleNotice) => {
-      return (trigger: boolean) => {
-        setToggleNotice(trigger);
-      };
-    },
-    []
-  );
+  const onToggleNoticeProcess = useCallback((setToggleNotice: TSetToggleNotice) => {
+    return (trigger: boolean) => {
+      setToggleNotice(trigger);
+    };
+  }, []);
   const onToggleNotice = onToggleNoticeProcess(setToggleNotice);
 
   return (
@@ -358,16 +317,14 @@ const Map: React.FC<TMapComponentProps> = ({
           onChange={onChangeMap}
           onZoomAnimationEnd={onZoomAnimationEnd}
           onClick={() => initEvent()}
-          onDrag={() => setRefreshLoading(true)}
+          onDrag={() => dispatch({ type: "TOGGLE_REFRESH_LOADING", payload: true })}
           onDragEnd={() => initEvent()}
         >
           {storeList &&
             currentZoom >= 13 &&
             // eslint-disable-next-line array-callback-return
             storeList.map((store: TStoreData) => {
-              const remainStatus = convertRemainStatusBoolean(
-                store.remain_stat
-              );
+              const remainStatus = convertRemainStatusBoolean(store.remain_stat);
               if (onlyAvailableStore) {
                 if (remainStatus) {
                   return (
@@ -397,12 +354,8 @@ const Map: React.FC<TMapComponentProps> = ({
                     lng={store.lng}
                     currentZoom={currentZoom}
                     storeData={store}
-                    currentHoverChecker={
-                      store.code !== currentHoverStore ? false : true
-                    }
-                    currentClickChecker={
-                      store.code !== currentClickStore ? false : true
-                    }
+                    currentHoverChecker={store.code !== currentHoverStore ? false : true}
+                    currentClickChecker={store.code !== currentClickStore ? false : true}
                     onMouseOverStore={onMouseOverStore}
                     initEvent={initEvent}
                     onClickStore={onClickStore}
@@ -419,10 +372,7 @@ const Map: React.FC<TMapComponentProps> = ({
           />
           <div className="util-button-wrap">
             {myLocation && (
-              <MyLocationButton
-                onMoveLocation={onMoveLocation}
-                myLocation={myLocation}
-              />
+              <MyLocationButton onMoveLocation={onMoveLocation} myLocation={myLocation} />
             )}
             {!myLocation && <MyLocationButton />}
             <RefreshButton

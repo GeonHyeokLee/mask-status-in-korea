@@ -1,24 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import Map from "./components/Map";
 import { InitialStyle } from "./styles/initialStyles";
 import styled from "styled-components";
 import Loading from "./components/common/Loading";
-import { manageBoundary } from "./utils/manageBoundary";
-import {
-  TStoreListData,
-  TSetStoreList,
-  TSetMapLoading,
-  TSetRefreshLoading,
-  TSuccessGetCurrentPositionCallbackData,
-  TSetCurrentLocation,
-  TSetMyLocation,
-  TUpdateStoreData,
-  TCurrentLocation,
-  TMyLocation,
-  TMapLoading,
-  TRefreshLoading,
-  TCurrentZoom
-} from "./types";
+import { TSuccessGetCurrentPositionCallbackData, TUpdateStoreData } from "./types";
+import { useStoreData } from "./hooks/useStoreData";
+import { useSelector, useDispatch } from "./hooks/useRedux";
+import { TGlobalAction } from "./modules/types";
 
 const Container = styled.div`
   position: relative;
@@ -27,68 +15,25 @@ const Container = styled.div`
 `;
 
 function App() {
-  const [currentLocation, setCurrentLocation] = useState<TCurrentLocation>();
-  const [myLocation, setMyLocation] = useState<TMyLocation>();
-  const [storeList, setStoreList] = useState<TStoreListData>();
-  const [mapLoading, setMapLoading] = useState<TMapLoading>(true);
-  const [refreshLoading, setRefreshLoading] = useState<TRefreshLoading>(false);
-  const [currentZoom, setCurrentZoom] = useState<TCurrentZoom>(16);
-
-  const updateStoreDataProcess = useCallback(
-    async (
-      setStoreList: TSetStoreList,
-      setMapLoading: TSetMapLoading,
-      setRefreshLoading: TSetRefreshLoading,
-      requireBoundary: number
-    ) => {
-      return async (requireLat: number, requireLng: number) => {
-        setRefreshLoading(true);
-        const url = `https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=${requireLat}&lng=${requireLng}&m=${requireBoundary}`;
-        const result = await fetch(url);
-        const resultToJson = await result.json();
-        setStoreList(resultToJson.stores);
-
-        setTimeout(() => {
-          setRefreshLoading(false);
-        }, 1000);
-
-        if (mapLoading) {
-          setTimeout(() => {
-            setMapLoading(false);
-          }, 1500);
-        }
-      };
-    },
-    [mapLoading]
-  );
-
-  const currentBoundary: number = manageBoundary(currentZoom);
-
-  const updateStoreData: TUpdateStoreData = updateStoreDataProcess(
-    setStoreList,
-    setMapLoading,
-    setRefreshLoading,
-    currentBoundary
-  );
+  const { mapLoading } = useSelector();
+  const dispatch = useDispatch();
+  const { updateStoreData } = useStoreData();
 
   const successGetCurrentPositionProcess = useCallback(
     (
       data: TSuccessGetCurrentPositionCallbackData,
-      setCurrentLocation: TSetCurrentLocation,
-      setMyLocation: TSetMyLocation,
+      dispatch: React.Dispatch<TGlobalAction>,
       updateStoreData: TUpdateStoreData
     ) => {
       return async () => {
-        setCurrentLocation(prev => ({
-          ...prev,
-          lat: data.coords.latitude,
-          lng: data.coords.longitude
-        }));
-        setMyLocation(prev => ({
-          ...prev,
-          lat: data.coords.latitude,
-          lng: data.coords.longitude
-        }));
+        dispatch({
+          type: "UPDATE_CURRENT_LOCATION",
+          payload: { lat: data.coords.latitude, lng: data.coords.longitude }
+        });
+        dispatch({
+          type: "UPDATE_MY_LOCATION",
+          payload: { lat: data.coords.latitude, lng: data.coords.longitude }
+        });
         (await updateStoreData)(data.coords.latitude, data.coords.longitude);
       };
     },
@@ -97,8 +42,7 @@ function App() {
 
   const failureGetCurrentPositionProcess = useCallback(
     async (
-      setCurrentLocation: TSetCurrentLocation,
-      setMyLocation: TSetMyLocation,
+      dispatch: React.Dispatch<TGlobalAction>,
       updateStoreData: TUpdateStoreData
     ) => {
       return async () => {
@@ -106,16 +50,14 @@ function App() {
           lat: 37.576333,
           lng: 126.976806
         };
-        setCurrentLocation(prev => ({
-          ...prev,
-          lat: INITIAL_COORDS.lat,
-          lng: INITIAL_COORDS.lng
-        }));
-        setMyLocation(prev => ({
-          ...prev,
-          lat: INITIAL_COORDS.lat,
-          lng: INITIAL_COORDS.lng
-        }));
+        dispatch({
+          type: "UPDATE_CURRENT_LOCATION",
+          payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng }
+        });
+        dispatch({
+          type: "UPDATE_MY_LOCATION",
+          payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng }
+        });
         (await updateStoreData)(INITIAL_COORDS.lat, INITIAL_COORDS.lng);
       };
     },
@@ -127,16 +69,14 @@ function App() {
       data => {
         const successGetCurrentPosition = successGetCurrentPositionProcess(
           data,
-          setCurrentLocation,
-          setMyLocation,
+          dispatch,
           updateStoreData
         );
         successGetCurrentPosition();
       },
       async () => {
         const failureGetCurrentPosition = await failureGetCurrentPositionProcess(
-          setCurrentLocation,
-          setMyLocation,
+          dispatch,
           updateStoreData
         );
         failureGetCurrentPosition();
@@ -150,17 +90,7 @@ function App() {
     <Container>
       <InitialStyle />
       {mapLoading && <Loading />}
-      <Map
-        currentLocation={currentLocation}
-        setCurrentLocation={setCurrentLocation}
-        myLocation={myLocation}
-        updateStoreData={updateStoreData}
-        storeList={storeList}
-        refreshLoading={refreshLoading}
-        setRefreshLoading={setRefreshLoading}
-        currentZoom={currentZoom}
-        setCurrentZoom={setCurrentZoom}
-      />
+      <Map />
     </Container>
   );
 }
