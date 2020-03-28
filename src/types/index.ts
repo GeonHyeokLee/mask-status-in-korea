@@ -50,19 +50,8 @@ export type TUpdateStoreData = Promise<(lat: number, lng: number) => Promise<voi
 // Map.tsx
 export type TCurrentHoverStore = string;
 export type TCurrentClickStore = string;
-export type TAddress = string;
 export type TToggleNotice = boolean;
 export type TOnlyAvailableStore = boolean;
-
-export type TSetCurrentHoverStore = React.Dispatch<
-  React.SetStateAction<TCurrentHoverStore>
->;
-export type TSetCurrentClickStore = React.Dispatch<
-  React.SetStateAction<TCurrentClickStore>
->;
-export type TSetAddress = React.Dispatch<React.SetStateAction<TAddress>>
-export type TSetToggleNotice = React.Dispatch<React.SetStateAction<TToggleNotice>>
-export type TSetOnlyAvailableStore = React.Dispatch<React.SetStateAction<TOnlyAvailableStore>>
 
 export type TInitEvent = (initHoverTrigger?: boolean, initClickTrigger?: boolean) => void
 export type TOnRefreshStoreData = () => Promise<void>
@@ -85,17 +74,14 @@ export type TStoreComponentProps = {
   initEvent: TInitEvent;
 };
 
+// AddressBar.tsx
+export type TAddress = string;
+export type TSetAddress = React.Dispatch<React.SetStateAction<string>>;
+
 // RefreshButton.tsx
 export type TRefreshButtonComponentProps = {
   onRefreshStoreData: TOnRefreshStoreData
   spin: boolean
-}
-
-// AddressBar.tsx
-export type TAddressBarComponentProps = {
-  onSubmitAddress: TOnSubmitAddress;
-  setAddress: TSetAddress;
-  address: TAddress;
 }
 
 // LocationStorage.tsx
@@ -123,12 +109,6 @@ export type TNoticeComponentProps = {
 // NoticeButton.tsx
 export type TNoticeButtonComponentProps = {
   onToggleNotice: TOnToggleNotice;
-};
-
-// OnlyAvailableStoreButton.tsx
-export type TOnlyAvailableStoreButtonComponentProps = {
-  onlyAvailableStore: TOnlyAvailableStore;
-  setOnlyAvailableStore: TSetOnlyAvailableStore;
 };
 
 // Loading.tsx

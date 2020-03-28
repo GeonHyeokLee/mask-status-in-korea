@@ -1,14 +1,12 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import styled from "styled-components";
 import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearchLocation } from "@fortawesome/free-solid-svg-icons";
-import {
-  TAddressBarComponentProps,
-  TSetAddress,
-  TAddress,
-  TOnSubmitAddress
-} from "../types";
+import { TAddress, TSetAddress, TOnSubmitAddress, TGeoCode } from "../types";
+import { useDispatch } from "../hooks/useRedux";
+import { TGlobalAction } from "../modules/types";
+import { geoCode } from "../utils/geoCode";
 
 const Container = styled.div`
   display: flex;
@@ -81,12 +79,30 @@ const Container = styled.div`
   }
 `;
 
-const AddressBar: React.FC<TAddressBarComponentProps> = ({
-  onSubmitAddress,
-  address,
-  setAddress
-}) => {
+const AddressBar: React.FC = () => {
+  const [address, setAddress] = useState<TAddress>("");
   const ref = useRef<HTMLButtonElement>(null);
+  const dispatch = useDispatch();
+
+  const onSubmitAddressProcess = useCallback(
+    (
+      dispatch: React.Dispatch<TGlobalAction>,
+      geoCode: TGeoCode,
+      setAddress: TSetAddress
+    ) => {
+      return async (address: string) => {
+        const result = await geoCode(address);
+        dispatch({
+          type: "UPDATE_CURRENT_LOCATION",
+          payload: { lat: result.lat, lng: result.lng }
+        });
+        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
+        setAddress("");
+      };
+    },
+    []
+  );
+  const onSubmitAddress = onSubmitAddressProcess(dispatch, geoCode, setAddress);
 
   const onChangeInputProcess = useCallback((setAddress: TSetAddress) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {

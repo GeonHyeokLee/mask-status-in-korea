@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { color } from "../styles/colors";
-import { TOnlyAvailableStoreButtonComponentProps } from "../types";
+import { useSelector, useDispatch } from "../hooks/useRedux";
 
 const Container = styled.div`
   display: flex;
@@ -30,18 +30,18 @@ const Container = styled.div`
   }
 `;
 
-const OnlyAvailableStoreButton: React.FC<TOnlyAvailableStoreButtonComponentProps> = ({
-  onlyAvailableStore,
-  setOnlyAvailableStore
-}) => {
+const OnlyAvailableStoreButton: React.FC = () => {
+  const { onlyAvailableStore } = useSelector();
+  const dispatch = useDispatch();
+
   return (
-    <Container onClick={() => setOnlyAvailableStore(!onlyAvailableStore)}>
-      {!onlyAvailableStore && (
-        <FontAwesomeIcon icon={faToggleOff}></FontAwesomeIcon>
-      )}
-      {onlyAvailableStore && (
-        <FontAwesomeIcon icon={faToggleOn}></FontAwesomeIcon>
-      )}
+    <Container
+      onClick={() =>
+        dispatch({ type: "TOGGLE_ONLY_AVAIL_STORE", payload: !onlyAvailableStore })
+      }
+    >
+      {!onlyAvailableStore && <FontAwesomeIcon icon={faToggleOff}></FontAwesomeIcon>}
+      {onlyAvailableStore && <FontAwesomeIcon icon={faToggleOn}></FontAwesomeIcon>}
     </Container>
   );
 };
