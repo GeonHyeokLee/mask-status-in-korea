@@ -7,20 +7,7 @@ import {
   convertRemainStatusColor,
   convertRemainStatusBoolean
 } from "../utils/convertRemainStatus";
-import { TStoreData } from "../types";
-
-type TStoreProps = {
-  key: any;
-  lat: any;
-  lng: any;
-  currentZoom: number;
-  storeData: TStoreData;
-  onCurrentHover: boolean;
-  onCurrentClick: boolean;
-  onMouseOverStore: (code: string) => void;
-  onClickStore: (lat: number, lng: number, code: string) => void;
-  initialEvent: (hover?: boolean, click?: boolean) => void;
-};
+import { TStoreComponentProps } from "../types";
 
 const Container = styled.div<{ currentZoom: number; statusColor: string }>`
   position: relative;
@@ -96,12 +83,12 @@ const StoreDetail = styled.div<{ statusColor: string }>`
   }
 `;
 
-const Store: React.FC<TStoreProps> = ({
+const Store: React.FC<TStoreComponentProps> = ({
   storeData,
-  onCurrentHover,
-  onCurrentClick,
+  currentHoverChecker,
+  currentClickChecker,
   onMouseOverStore,
-  initialEvent,
+  initEvent,
   currentZoom,
   onClickStore
 }) => {
@@ -116,7 +103,7 @@ const Store: React.FC<TStoreProps> = ({
           onClickStore(storeData.lat, storeData.lng, storeData.code)
         }
         onMouseOver={() => onMouseOverStore(storeData.code)}
-        onMouseLeave={() => initialEvent(true, false)}
+        onMouseLeave={() => initEvent(true, false)}
         onTouchEnd={() =>
           onClickStore(storeData.lat, storeData.lng, storeData.code)
         }
@@ -131,7 +118,7 @@ const Store: React.FC<TStoreProps> = ({
             convertRemainStatusBoolean(storeData.remain_stat) &&
             storeData.name}
       </h3>
-      {(onCurrentHover || onCurrentClick) && (
+      {(currentHoverChecker || currentClickChecker) && (
         <StoreDetail
           statusColor={convertRemainStatusColor(storeData.remain_stat)}
         >

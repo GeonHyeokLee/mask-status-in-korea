@@ -1,10 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { color } from "../styles/colors";
-
-type TNoticeProps = {
-  onToggleNotice: (trigger: boolean) => void;
-};
+import { TNoticeComponentProps } from "../types";
 
 const Container = styled.div`
   position: fixed;
@@ -106,7 +103,7 @@ const Container = styled.div`
   }
 `;
 
-const Notice: React.FC<TNoticeProps> = ({ onToggleNotice }) => {
+const Notice: React.FC<TNoticeComponentProps> = ({ onToggleNotice }) => {
   return (
     <Container>
       <ul>

@@ -3,10 +3,7 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
-
-type TMyLocationButtonProps = {
-  onMoveMyLocation?: () => void;
-};
+import { TMyLocationButtonComponentProps } from "../types";
 
 const Container = styled.div`
   width: 64px;
@@ -35,11 +32,18 @@ const Container = styled.div`
   }
 `;
 
-const MyLocationButton: React.FC<TMyLocationButtonProps> = ({
-  onMoveMyLocation
+const MyLocationButton: React.FC<TMyLocationButtonComponentProps> = ({
+  myLocation,
+  onMoveLocation
 }) => {
   return (
-    <Container onClick={onMoveMyLocation}>
+    <Container
+      onClick={
+        myLocation &&
+        onMoveLocation &&
+        (() => onMoveLocation(myLocation.lat, myLocation.lng))
+      }
+    >
       <FontAwesomeIcon icon={faCrosshairs} />
     </Container>
   );

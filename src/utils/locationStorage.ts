@@ -1,20 +1,17 @@
-type TLocation = {
-  lat: number;
-  lng: number;
-};
+import { TLocationData } from "../types";
 
 export const getLocationData = () => {
   const maskStatusLocationData = localStorage.getItem(
     "maskStatusLocation"
   );
   if (maskStatusLocationData) {
-    const data: TLocation[] = JSON.parse(maskStatusLocationData);
+    const data: TLocationData = JSON.parse(maskStatusLocationData);
     return data;
   }
 }
 
 export const postLocationData =
-  (locationData: TLocation[]) => {
+  (locationData: TLocationData) => {
     localStorage.setItem(
       "maskStatusLocation",
       JSON.stringify(locationData)

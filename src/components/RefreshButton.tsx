@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
+import { TRefreshButtonComponentProps } from "../types";
 
 const Container = styled.div`
   display: flex;
@@ -27,7 +28,10 @@ const Container = styled.div`
   }
 `;
 
-const RefreshButton: React.FC<any> = ({ onRefreshStoreData, spin }) => {
+const RefreshButton: React.FC<TRefreshButtonComponentProps> = ({
+  onRefreshStoreData,
+  spin
+}) => {
   return (
     <Container onClick={onRefreshStoreData}>
       <FontAwesomeIcon icon={faSync} spin={spin} />

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { color } from "../../styles/colors";
+import { TLoadingComponentProps } from "../../types";
 
 const Container = styled.div<{ noneBackground: boolean }>`
   position: fixed;
@@ -25,7 +26,7 @@ const Container = styled.div<{ noneBackground: boolean }>`
   }
 `;
 
-const Loading: React.FC<{ noneBackground?: boolean }> = ({
+const Loading: React.FC<TLoadingComponentProps> = ({
   noneBackground = false
 }) => {
   return (

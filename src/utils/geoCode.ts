@@ -1,6 +1,7 @@
 import { GOOGLE_MAP_API, isDev } from "../dotenv";
+import { TGeoCode, TReverseGeoCode } from "../types";
 
-export const geoCode = async (address: string) => {
+export const geoCode: TGeoCode = async (address: string) => {
   const URL = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${isDev ? "" : GOOGLE_MAP_API}`;
   const result = await fetch(URL);
   const data = await result.json();
@@ -13,7 +14,7 @@ export const geoCode = async (address: string) => {
   };
 };
 
-export const reverseGeoCode = async (lat: number, lng: number) => {
+export const reverseGeoCode: TReverseGeoCode = async (lat: number, lng: number) => {
   const URL = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${isDev ? "" : GOOGLE_MAP_API}`;
   const result = await fetch(URL);
   const data = await result.json();

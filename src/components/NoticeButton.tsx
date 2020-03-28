@@ -3,10 +3,7 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation } from "@fortawesome/free-solid-svg-icons";
-
-type TNoticeButtonProps = {
-  onToggleNotice: (trigger: boolean) => void;
-};
+import { TNoticeButtonComponentProps } from "../types";
 
 const Container = styled.div`
   width: 64px;
@@ -51,7 +48,9 @@ const Container = styled.div`
   }
 `;
 
-const NoticeButton: React.FC<TNoticeButtonProps> = ({ onToggleNotice }) => {
+const NoticeButton: React.FC<TNoticeButtonComponentProps> = ({
+  onToggleNotice
+}) => {
   return (
     <Container onClick={() => onToggleNotice(true)}>
       <FontAwesomeIcon icon={faExclamation} />

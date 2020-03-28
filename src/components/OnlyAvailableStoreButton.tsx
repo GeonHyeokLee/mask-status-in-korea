@@ -3,11 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { color } from "../styles/colors";
-
-type TOnlyAvailableStoreButtonProps = {
-  onlyAvailableStore: boolean;
-  setOnlyAvailableStore: React.Dispatch<React.SetStateAction<boolean>>;
-};
+import { TOnlyAvailableStoreButtonComponentProps } from "../types";
 
 const Container = styled.div`
   display: flex;
@@ -34,7 +30,7 @@ const Container = styled.div`
   }
 `;
 
-const OnlyAvailableStoreButton: React.FC<TOnlyAvailableStoreButtonProps> = ({
+const OnlyAvailableStoreButton: React.FC<TOnlyAvailableStoreButtonComponentProps> = ({
   onlyAvailableStore,
   setOnlyAvailableStore
 }) => {

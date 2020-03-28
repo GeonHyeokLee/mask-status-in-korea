@@ -5,16 +5,12 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { getLocationData, postLocationData } from "../utils/locationStorage";
-
-type TLocationStorageProps = {
-  onMoveLocation: (lat: number, lng: number) => void;
-  currentLocation:
-    | {
-        lat: number;
-        lng: number;
-      }
-    | undefined;
-};
+import {
+  TLocationStorageComponentProps,
+  TLocationData,
+  TPostLocationData,
+  TSetLocationData
+} from "../types";
 
 const Container = styled.div`
   position: relative;
@@ -66,39 +62,48 @@ const Container = styled.div`
   }
 `;
 
-const LocationStorage: React.FC<TLocationStorageProps> = ({
+const LocationStorage: React.FC<TLocationStorageComponentProps> = ({
   onMoveLocation,
   currentLocation
 }) => {
-  const [locationData, setLocationData] = useState<
-    {
-      lat: number;
-      lng: number;
-    }[]
-  >([]);
+  const [locationData, setLocationData] = useState<TLocationData>([]);
 
-  const saveNewLocationData = useCallback(
-    (lat: number, lng: number) => {
-      if (locationData.length <= 1) {
-        const newData = [...locationData, { lat, lng }];
-        postLocationData(newData);
-        setLocationData(newData);
-      }
+  const saveNewLocationDataProcess = useCallback(
+    (
+      locationData: TLocationData,
+      postLocationData: TPostLocationData,
+      setLocationData: TSetLocationData
+    ) => {
+      return (lat: number, lng: number) => {
+        if (locationData.length <= 1) {
+          const newData = [...locationData, { lat, lng }];
+          postLocationData(newData);
+          setLocationData(newData);
+        }
+      };
     },
-    [locationData]
+    []
+  );
+  const saveNewLocationData = saveNewLocationDataProcess(
+    locationData,
+    postLocationData,
+    setLocationData
   );
 
-  const popLocationData = useCallback(() => {
-    if (locationData) {
-      const newData = locationData.filter((data, index) => {
-        return index !== locationData.length - 1;
-      });
-      if (newData) {
-        postLocationData(newData);
-        setLocationData(newData);
+  const popLocationDataProcess = useCallback((locationData: TLocationData) => {
+    return () => {
+      if (locationData) {
+        const newData = locationData.filter((data, index) => {
+          return index !== locationData.length - 1;
+        });
+        if (newData) {
+          postLocationData(newData);
+          setLocationData(newData);
+        }
       }
-    }
-  }, [locationData]);
+    };
+  }, []);
+  const popLocationData = popLocationDataProcess(locationData);
 
   useEffect(() => {
     const loadData = getLocationData();

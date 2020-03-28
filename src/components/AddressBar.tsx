@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearchLocation } from "@fortawesome/free-solid-svg-icons";
-
-type TAddressBarProps = {
-  onSubmitAddress: (address: string) => Promise<void>;
-  address: string;
-  setAddress: React.Dispatch<React.SetStateAction<string>>;
-};
+import {
+  TAddressBarComponentProps,
+  TSetAddress,
+  TAddress,
+  TOnSubmitAddress
+} from "../types";
 
 const Container = styled.div`
   display: flex;
@@ -81,47 +81,50 @@ const Container = styled.div`
   }
 `;
 
-const AddressBar: React.FC<TAddressBarProps> = ({
+const AddressBar: React.FC<TAddressBarComponentProps> = ({
   onSubmitAddress,
   address,
   setAddress
 }) => {
   const ref = useRef<any>(null);
 
-  const onChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeInputProcess = useCallback((setAddress: TSetAddress) => {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
       const {
         target: { value }
       } = event;
       setAddress(value);
-    },
-    [setAddress]
-  );
+    };
+  }, []);
+  const onChangeInput = onChangeInputProcess(setAddress);
 
-  const onSubmit = useCallback(
-    async (
-      event:
-        | React.FormEvent<HTMLFormElement>
-        | React.MouseEvent<HTMLButtonElement, MouseEvent>
-        | React.TouchEvent<HTMLButtonElement>
-    ) => {
-      event.preventDefault();
-      await onSubmitAddress(address);
-      ref.current.focus();
+  const onSubmitFormProcess = useCallback(
+    (onSubmitAddress: TOnSubmitAddress, address: TAddress, ref: any) => {
+      return async (
+        event:
+          | React.FormEvent<HTMLFormElement>
+          | React.MouseEvent<HTMLButtonElement, MouseEvent>
+          | React.TouchEvent<HTMLButtonElement>
+      ) => {
+        event.preventDefault();
+        await onSubmitAddress(address);
+        ref.current.focus();
+      };
     },
-    [address, onSubmitAddress]
+    []
   );
+  const onSubmitForm = onSubmitFormProcess(onSubmitAddress, address, ref);
 
   return (
     <Container>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmitForm}>
         <input
           name="address"
           placeholder="주소 검색"
-          onChange={onChange}
+          onChange={onChangeInput}
           value={address}
         />
-        <button onClick={onSubmit} onTouchEnd={onSubmit} ref={ref}>
+        <button onClick={onSubmitForm} onTouchEnd={onSubmitForm} ref={ref}>
           <FontAwesomeIcon icon={faSearchLocation} />
         </button>
       </form>
