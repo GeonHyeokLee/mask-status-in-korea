@@ -25,32 +25,44 @@ function App() {
   const [refreshLoading, setRefreshLoading] = useState<boolean>(false);
   const [currentZoom, setCurrentZoom] = useState<number>(16);
 
-  const updateStoreData = useCallback(
-    async (lat: number, lng: number, currentZoom: number) => {
-      setRefreshLoading(true);
+  const updateStoreDataProcess = useCallback(
+    async (
+      setStoreList: React.Dispatch<any>,
+      setMapLoading: React.Dispatch<boolean>,
+      setRefreshLoading: React.Dispatch<boolean>
+    ) => {
+      return async (lat: number, lng: number, currentZoom: number) => {
+        setRefreshLoading(true);
 
-      const url = `https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=${lat}&lng=${lng}&m=${manageBoundary(
-        currentZoom
-      )}`;
-      const result = await fetch(url);
-      const resultToJson = await result.json();
-      setStoreList(resultToJson.stores);
+        const url = `https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat=${lat}&lng=${lng}&m=${manageBoundary(
+          currentZoom
+        )}`;
+        const result = await fetch(url);
+        const resultToJson = await result.json();
+        setStoreList(resultToJson.stores);
 
-      setTimeout(() => {
-        setRefreshLoading(false);
-      }, 1000);
-
-      if (mapLoading) {
         setTimeout(() => {
-          setMapLoading(false);
-        }, 1500);
-      }
+          setRefreshLoading(false);
+        }, 1000);
+
+        if (mapLoading) {
+          setTimeout(() => {
+            setMapLoading(false);
+          }, 1500);
+        }
+      };
     },
     [mapLoading]
   );
 
+  const updateStoreData = updateStoreDataProcess(
+    setStoreList,
+    setMapLoading,
+    setRefreshLoading
+  );
+
   const successGetCurrentPosition = useCallback(
-    (data: any) => {
+    async (data: any) => {
       setCurrentLocation(prev => ({
         ...prev,
         lat: data?.coords?.latitude,
@@ -61,12 +73,16 @@ function App() {
         lat: data?.coords?.latitude,
         lng: data?.coords?.longitude
       }));
-      updateStoreData(data.coords.latitude, data.coords.longitude, currentZoom);
+      (await updateStoreData)(
+        data.coords.latitude,
+        data.coords.longitude,
+        currentZoom
+      );
     },
     [updateStoreData, currentZoom]
   );
 
-  const failureGetCurrentPosition = useCallback(() => {
+  const failureGetCurrentPosition = useCallback(async () => {
     const INITIAL_COORDS = {
       lat: 37.576333,
       lng: 126.976806
@@ -81,7 +97,11 @@ function App() {
       lat: INITIAL_COORDS.lat,
       lng: INITIAL_COORDS.lng
     }));
-    updateStoreData(INITIAL_COORDS.lat, INITIAL_COORDS.lng, currentZoom);
+    (await updateStoreData)(
+      INITIAL_COORDS.lat,
+      INITIAL_COORDS.lng,
+      currentZoom
+    );
   }, [currentZoom, updateStoreData]);
 
   useEffect(() => {

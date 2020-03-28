@@ -39,7 +39,9 @@ type TMapProps = {
         lng: number;
       }
     | undefined;
-  updateStoreData: (lat: number, lng: number, currentZoom: number) => void;
+  updateStoreData: Promise<
+    (lat: number, lng: number, currentZoom: number) => Promise<void>
+  >;
   storeList: any;
   setRefreshLoading: React.Dispatch<React.SetStateAction<boolean>>;
   refreshLoading: boolean;
@@ -194,7 +196,7 @@ const Map: React.FC<TMapProps> = ({
         lat: center.lat,
         lng: center.lng
       }));
-      updateStoreData(center.lat, center.lng, currentZoom);
+      (await updateStoreData)(center.lat, center.lng, currentZoom);
     },
     [currentZoom, setCurrentLocation, updateStoreData]
   );
@@ -259,9 +261,13 @@ const Map: React.FC<TMapProps> = ({
     [setCurrentLocation, setCurrentZoom]
   );
 
-  const onRefreshStoreData = useCallback(() => {
+  const onRefreshStoreData = useCallback(async () => {
     if (currentLocation) {
-      updateStoreData(currentLocation.lat, currentLocation.lng, currentZoom);
+      (await updateStoreData)(
+        currentLocation.lat,
+        currentLocation.lng,
+        currentZoom
+      );
     }
   }, [currentLocation, currentZoom, updateStoreData]);
 
