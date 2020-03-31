@@ -1,11 +1,11 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import Map from "./components/Map";
 import { InitialStyle } from "./styles/initialStyles";
 import styled from "styled-components";
 import Loading from "./components/common/Loading";
 import { TSuccessGetCurrentPositionCallbackData, TUpdateStoreData } from "./types";
 import { useStoreData } from "./hooks/useStoreData";
-import { useSelector, useDispatch } from "./hooks/useRedux";
+import { useDispatch } from "./hooks/useRedux";
 import { TGlobalAction } from "./modules/types";
 
 const Container = styled.div`
@@ -15,7 +15,7 @@ const Container = styled.div`
 `;
 
 function App() {
-  const { mapLoading } = useSelector();
+  const [mapLoading, setMapLoading] = useState<boolean>(true);
   const dispatch = useDispatch();
   const { updateStoreData } = useStoreData();
 
@@ -23,7 +23,9 @@ function App() {
     (
       data: TSuccessGetCurrentPositionCallbackData,
       dispatch: React.Dispatch<TGlobalAction>,
-      updateStoreData: TUpdateStoreData
+      updateStoreData: TUpdateStoreData,
+      mapLoading: boolean,
+      setMapLoading: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
       return async () => {
         dispatch({
@@ -35,6 +37,9 @@ function App() {
           payload: { lat: data.coords.latitude, lng: data.coords.longitude }
         });
         (await updateStoreData)(data.coords.latitude, data.coords.longitude);
+        if (mapLoading) {
+          setMapLoading(false);
+        }
       };
     },
     []
@@ -43,7 +48,9 @@ function App() {
   const failureGetCurrentPositionProcess = useCallback(
     async (
       dispatch: React.Dispatch<TGlobalAction>,
-      updateStoreData: TUpdateStoreData
+      updateStoreData: TUpdateStoreData,
+      mapLoading: boolean,
+      setMapLoading: React.Dispatch<React.SetStateAction<boolean>>
     ) => {
       return async () => {
         const INITIAL_COORDS = {
@@ -59,6 +66,9 @@ function App() {
           payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng }
         });
         (await updateStoreData)(INITIAL_COORDS.lat, INITIAL_COORDS.lng);
+        if (mapLoading) {
+          setMapLoading(false);
+        }
       };
     },
     []
@@ -70,14 +80,18 @@ function App() {
         const successGetCurrentPosition = successGetCurrentPositionProcess(
           data,
           dispatch,
-          updateStoreData
+          updateStoreData,
+          mapLoading,
+          setMapLoading
         );
         successGetCurrentPosition();
       },
       async () => {
         const failureGetCurrentPosition = await failureGetCurrentPositionProcess(
           dispatch,
-          updateStoreData
+          updateStoreData,
+          mapLoading,
+          setMapLoading
         );
         failureGetCurrentPosition();
       },

@@ -48,9 +48,7 @@ const Container = styled.div`
   }
 `;
 
-const NoticeButton: React.FC<TNoticeButtonComponentProps> = ({
-  onToggleNotice
-}) => {
+const NoticeButton: React.FC<TNoticeButtonComponentProps> = ({ onToggleNotice }) => {
   return (
     <Container onClick={() => onToggleNotice(true)}>
       <FontAwesomeIcon icon={faExclamation} />

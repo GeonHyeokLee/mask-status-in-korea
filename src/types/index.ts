@@ -11,7 +11,6 @@ export type TStoreData = {
   lng: number;
 }
 export type TStoreListData = TStoreData[] | undefined;
-export type TMapLoading = boolean;
 export type TRefreshLoading = boolean;
 export type TCurrentLocation = {
   lat: number;
@@ -48,18 +47,12 @@ export type TSuccessGetCurrentPositionCallbackData = {
 export type TUpdateStoreData = Promise<(lat: number, lng: number) => Promise<void>>;
 
 // Map.tsx
-export type TCurrentHoverStore = string;
-export type TCurrentClickStore = string;
-export type TToggleNotice = boolean;
-export type TOnlyAvailableStore = boolean;
-
 export type TInitEvent = (initHoverTrigger?: boolean, initClickTrigger?: boolean) => void
 export type TOnRefreshStoreData = () => Promise<void>
 export type TOnMouseOverStore = (code: string) => void;
 export type TOnClickStore = (lat: number, lng: number, code: string) => void;
 export type TOnSubmitAddress = (address: string) => Promise<void>
 export type TOnMoveLocation = (lat: number, lng: number) => void;
-export type TOnToggleNotice = (trigger: boolean) => void
 
 // Store.tsx
 export type TStoreComponentProps = {
@@ -103,12 +96,12 @@ export type TMyLocationButtonComponentProps = {
 
 // Notice.tsx
 export type TNoticeComponentProps = {
-  onToggleNotice: TOnToggleNotice;
+  onToggleNotice: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // NoticeButton.tsx
 export type TNoticeButtonComponentProps = {
-  onToggleNotice: TOnToggleNotice;
+  onToggleNotice: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 // Loading.tsx

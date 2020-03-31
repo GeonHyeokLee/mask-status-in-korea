@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import GoogleMapReact, { ChangeEventValue } from "google-map-react";
 import Store from "./Store";
 import styled from "styled-components";
@@ -60,11 +60,12 @@ const UtilWrap = styled.div`
       border-radius: 0 40px 40px 40px;
       background-color: rgba(0, 0, 0, 0.7);
       color: ${color.white};
+      cursor: pointer;
       @media (max-width: 1023px) {
         top: 16px;
-        right: -65px;
-        height: 35px;
-        font-size: 11px;
+        right: -55px;
+        height: 25px;
+        font-size: 10px;
       }
       > span {
         color: ${color.yellow};
@@ -119,15 +120,12 @@ const InformationWrap = styled.div`
 `;
 
 const Map: React.FC = () => {
-  const {
-    currentLocation,
-    currentZoom,
-    myLocation,
-    currentHoverStore,
-    currentClickStore,
-    toggleNotice,
-    onlyAvailableStore
-  } = useSelector();
+  const [currentHoverStore, setCurrentHoverStore] = useState<string>("");
+  const [currentClickStore, setCurrentClickStore] = useState<string>("");
+  const [bubbleMessageStatus, setBubbleMessageStatus] = useState<boolean>(true);
+  const [noticeStatus, setNoticeStatus] = useState<boolean>(false);
+  const [onlyAvailableStore, setOnlyAvailableStore] = useState<boolean>(false);
+  const { currentLocation, currentZoom, myLocation } = useSelector();
   const dispatch = useDispatch();
   const {
     stores: storeList,
@@ -136,25 +134,34 @@ const Map: React.FC = () => {
     setRefreshLoading
   } = useStoreData();
 
-  const initEventProcess = useCallback((dispatch: React.Dispatch<TGlobalAction>) => {
-    return (initHoverTrigger: boolean = true, initClickTrigger: boolean = true) => {
-      const initialStoreCode: string = "-999999";
-      if (initHoverTrigger) {
-        dispatch({ type: "UPDATE_CURRENT_HOVER_STORE", payload: initialStoreCode });
-      }
-      if (initClickTrigger) {
-        dispatch({ type: "UPDATE_CURRENT_CLICK_STORE", payload: initialStoreCode });
-      }
-    };
-  }, []);
+  const initEventProcess = useCallback(
+    (
+      setCurrentHoverStore: React.Dispatch<React.SetStateAction<string>>,
+      setCurrentClickStore: React.Dispatch<React.SetStateAction<string>>
+    ) => {
+      return (initHoverTrigger: boolean = true, initClickTrigger: boolean = true) => {
+        const initialStoreCode: string = "-999999";
+        if (initHoverTrigger) {
+          setCurrentHoverStore(initialStoreCode);
+        }
+        if (initClickTrigger) {
+          setCurrentClickStore(initialStoreCode);
+        }
+      };
+    },
+    []
+  );
 
-  const initEvent: TInitEvent = initEventProcess(dispatch);
+  const initEvent: TInitEvent = initEventProcess(
+    setCurrentHoverStore,
+    setCurrentClickStore
+  );
 
   const onMouseOverStoreProcess = useCallback(
     (
-      dispatch: React.Dispatch<TGlobalAction>,
       initEvent: TInitEvent,
-      currentClickStore: string
+      currentClickStore: string,
+      setCurrentHoverStore: React.Dispatch<React.SetStateAction<string>>
     ) => {
       return (code: string) => {
         if (code !== currentClickStore) {
@@ -162,16 +169,16 @@ const Map: React.FC = () => {
         } else {
           initEvent(true, false);
         }
-        dispatch({ type: "UPDATE_CURRENT_HOVER_STORE", payload: code });
+        setCurrentHoverStore(code);
       };
     },
     []
   );
 
   const onMouseOverStore = onMouseOverStoreProcess(
-    dispatch,
     initEvent,
-    currentClickStore
+    currentClickStore,
+    setCurrentHoverStore
   );
 
   const onChangeMapProcess = useCallback(
@@ -202,16 +209,17 @@ const Map: React.FC = () => {
     (
       dispatch: React.Dispatch<TGlobalAction>,
       initEvent: TInitEvent,
+      currentZoom: number,
       currentClickStore: string,
-      currentZoom: number
+      setCurrentClickStore: React.Dispatch<React.SetStateAction<string>>
     ) => {
       return (lat: number, lng: number, code: string) => {
         initEvent();
         dispatch({ type: "UPDATE_CURRENT_LOCATION", payload: { lat, lng } });
         if (currentClickStore === code) {
-          dispatch({ type: "UPDATE_CURRENT_CLICK_STORE", payload: "-999999" });
+          setCurrentClickStore("-999999");
         } else {
-          dispatch({ type: "UPDATE_CURRENT_CLICK_STORE", payload: code });
+          setCurrentClickStore(code);
         }
         if (currentZoom <= 16) {
           dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
@@ -224,8 +232,9 @@ const Map: React.FC = () => {
   const onClickStore = onClickStoreProcess(
     dispatch,
     initEvent,
+    currentZoom,
     currentClickStore,
-    currentZoom
+    setCurrentClickStore
   );
 
   const onMoveLocationProcess = useCallback(
@@ -251,13 +260,6 @@ const Map: React.FC = () => {
     []
   );
   const onRefreshStoreData = onRefreshStoreDataProcess(currentLocation, updateStoreData);
-
-  const onToggleNoticeProcess = useCallback((dispatch: React.Dispatch<TGlobalAction>) => {
-    return (trigger: boolean) => {
-      dispatch({ type: "TOGGLE_NOTICE", payload: trigger });
-    };
-  }, []);
-  const onToggleNotice = onToggleNoticeProcess(dispatch);
 
   return (
     <>
@@ -327,10 +329,19 @@ const Map: React.FC = () => {
               onRefreshStoreData={onRefreshStoreData}
               spin={refreshLoading ? true : false}
             />
-            <OnlyAvailableStoreButton />
-            <div className="bubble-message">
-              <span>NEW</span> 재고있는 약국만 보기
-            </div>
+            <OnlyAvailableStoreButton
+              onlyAvailableStore={onlyAvailableStore}
+              setOnlyAvailableStore={setOnlyAvailableStore}
+              setBubbleMessageStatus={setBubbleMessageStatus}
+            />
+            {bubbleMessageStatus && (
+              <div
+                className="bubble-message"
+                onClick={() => setBubbleMessageStatus(false)}
+              >
+                <span>NEW</span> 재고있는 약국만 보기
+              </div>
+            )}
           </div>
           <LocationStorage
             onMoveLocation={onMoveLocation}
@@ -338,12 +349,12 @@ const Map: React.FC = () => {
           />
         </UtilWrap>
         <InformationWrap>
-          <NoticeButton onToggleNotice={onToggleNotice} />
+          <NoticeButton onToggleNotice={setNoticeStatus} />
           <Information />
         </InformationWrap>
       </Container>
       {currentZoom < 13 && <Caution />}
-      {toggleNotice && <Notice onToggleNotice={onToggleNotice} />}
+      {noticeStatus && <Notice onToggleNotice={setNoticeStatus} />}
     </>
   );
 };

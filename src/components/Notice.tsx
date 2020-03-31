@@ -111,8 +111,8 @@ const Notice: React.FC<TNoticeComponentProps> = ({ onToggleNotice }) => {
         <li>
           <h3>공적 마스크 현황 (feat.코로나 싫어요)</h3>
           <span role="img" aria-label="notice">
-            <b>건강보험심사평가원</b>이 제공하는 재고 현황을 토대로 갱신되요.
-            현장에서의 재고 상황과 다를수 있어요.
+            <b>건강보험심사평가원</b>이 제공하는 재고 현황을 토대로 갱신되요. 현장에서의
+            재고 상황과 다를수 있어요.
           </span>
         </li>
         <li>

@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { color } from "../styles/colors";
-import { useSelector, useDispatch } from "../hooks/useRedux";
 
 const Container = styled.div`
   display: flex;
@@ -28,20 +27,38 @@ const Container = styled.div`
       font-size: 16px;
     }
   }
+  svg.on {
+    color: ${color.green};
+  }
 `;
 
-const OnlyAvailableStoreButton: React.FC = () => {
-  const { onlyAvailableStore } = useSelector();
-  const dispatch = useDispatch();
+const OnlyAvailableStoreButton: React.FC<{
+  onlyAvailableStore: boolean;
+  setOnlyAvailableStore: React.Dispatch<React.SetStateAction<boolean>>;
+  setBubbleMessageStatus: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ onlyAvailableStore, setOnlyAvailableStore, setBubbleMessageStatus }) => {
+  const onClickProcess = (
+    onlyAvailableStore: boolean,
+    setOnlyAvailableStore: React.Dispatch<React.SetStateAction<boolean>>,
+    setBubbleMessageStatus: React.Dispatch<React.SetStateAction<boolean>>
+  ) => {
+    return () => {
+      setBubbleMessageStatus(false);
+      setOnlyAvailableStore(!onlyAvailableStore);
+    };
+  };
+  const onClick = onClickProcess(
+    onlyAvailableStore,
+    setOnlyAvailableStore,
+    setBubbleMessageStatus
+  );
 
   return (
-    <Container
-      onClick={() =>
-        dispatch({ type: "TOGGLE_ONLY_AVAIL_STORE", payload: !onlyAvailableStore })
-      }
-    >
+    <Container onClick={onClick}>
       {!onlyAvailableStore && <FontAwesomeIcon icon={faToggleOff}></FontAwesomeIcon>}
-      {onlyAvailableStore && <FontAwesomeIcon icon={faToggleOn}></FontAwesomeIcon>}
+      {onlyAvailableStore && (
+        <FontAwesomeIcon icon={faToggleOn} className="on"></FontAwesomeIcon>
+      )}
     </Container>
   );
 };
