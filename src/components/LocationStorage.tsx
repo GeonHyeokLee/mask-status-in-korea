@@ -5,12 +5,75 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { getLocationData, postLocationData } from "../utils/locationStorage";
-import {
-  TLocationStorageComponentProps,
-  TLocationData,
-  TPostLocationData,
-  TSetLocationData
-} from "../types";
+import { TLocationStorageComponentProps, TLocationData } from "../types";
+
+const LocationStorage: React.FC<TLocationStorageComponentProps> = ({
+  onMoveLocation,
+  currentLocation,
+}) => {
+  const [locationData, setLocationData] = useState<TLocationData>([]);
+
+  const saveNewLocationDataProcess = useCallback((locationData: TLocationData) => {
+    return (lat: number, lng: number) => {
+      if (locationData.length <= 1) {
+        const newData = [...locationData, { lat, lng }];
+        postLocationData(newData);
+        setLocationData(newData);
+      }
+    };
+  }, []);
+  const saveNewLocationData = saveNewLocationDataProcess(locationData);
+
+  const popLocationDataProcess = useCallback((locationData: TLocationData) => {
+    return () => {
+      if (locationData) {
+        const newData = locationData.filter((data, index) => {
+          return index !== locationData.length - 1;
+        });
+        if (newData) {
+          postLocationData(newData);
+          setLocationData(newData);
+        }
+      }
+    };
+  }, []);
+  const popLocationData = popLocationDataProcess(locationData);
+
+  useEffect(() => {
+    const loadData = getLocationData();
+    if (loadData) {
+      setLocationData(loadData);
+    }
+  }, []);
+
+  return (
+    <Container>
+      <div>
+        <div
+          onClick={
+            currentLocation &&
+            (() => saveNewLocationData(currentLocation?.lat, currentLocation.lng))
+          }
+        >
+          <FontAwesomeIcon icon={faPlus} />
+        </div>
+        <div onClick={popLocationData}>
+          <FontAwesomeIcon icon={faMinus} />
+        </div>
+      </div>
+      <div>
+        {locationData &&
+          locationData.map((location, index: number) => (
+            <div key={index} onClick={() => onMoveLocation(location.lat, location.lng)}>
+              <FontAwesomeIcon icon={faFlag} />
+            </div>
+          ))}
+      </div>
+    </Container>
+  );
+};
+
+export default React.memo(LocationStorage);
 
 const Container = styled.div`
   position: relative;
@@ -61,86 +124,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const LocationStorage: React.FC<TLocationStorageComponentProps> = ({
-  onMoveLocation,
-  currentLocation
-}) => {
-  const [locationData, setLocationData] = useState<TLocationData>([]);
-
-  const saveNewLocationDataProcess = useCallback(
-    (
-      locationData: TLocationData,
-      postLocationData: TPostLocationData,
-      setLocationData: TSetLocationData
-    ) => {
-      return (lat: number, lng: number) => {
-        if (locationData.length <= 1) {
-          const newData = [...locationData, { lat, lng }];
-          postLocationData(newData);
-          setLocationData(newData);
-        }
-      };
-    },
-    []
-  );
-  const saveNewLocationData = saveNewLocationDataProcess(
-    locationData,
-    postLocationData,
-    setLocationData
-  );
-
-  const popLocationDataProcess = useCallback((locationData: TLocationData) => {
-    return () => {
-      if (locationData) {
-        const newData = locationData.filter((data, index) => {
-          return index !== locationData.length - 1;
-        });
-        if (newData) {
-          postLocationData(newData);
-          setLocationData(newData);
-        }
-      }
-    };
-  }, []);
-  const popLocationData = popLocationDataProcess(locationData);
-
-  useEffect(() => {
-    const loadData = getLocationData();
-    if (loadData) {
-      setLocationData(loadData);
-    }
-  }, []);
-
-  return (
-    <Container>
-      <div>
-        <div
-          onClick={
-            currentLocation &&
-            (() =>
-              saveNewLocationData(currentLocation?.lat, currentLocation.lng))
-          }
-        >
-          <FontAwesomeIcon icon={faPlus} />
-        </div>
-        <div onClick={popLocationData}>
-          <FontAwesomeIcon icon={faMinus} />
-        </div>
-      </div>
-      <div>
-        {locationData &&
-          locationData.map((location, index: number) => (
-            <div
-              key={index}
-              onClick={() => onMoveLocation(location.lat, location.lng)}
-            >
-              <FontAwesomeIcon icon={faFlag} />
-            </div>
-          ))}
-      </div>
-    </Container>
-  );
-};
-
-export default React.memo(LocationStorage);

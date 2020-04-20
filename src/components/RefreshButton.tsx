@@ -5,6 +5,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import { TRefreshButtonComponentProps } from "../types";
 
+const RefreshButton: React.FC<TRefreshButtonComponentProps> = ({
+  onRefreshStoreData,
+  spin,
+}) => {
+  return (
+    <Container onClick={onRefreshStoreData}>
+      <FontAwesomeIcon icon={faSync} spin={spin} />
+    </Container>
+  );
+};
+
+export default RefreshButton;
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -27,16 +40,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const RefreshButton: React.FC<TRefreshButtonComponentProps> = ({
-  onRefreshStoreData,
-  spin
-}) => {
-  return (
-    <Container onClick={onRefreshStoreData}>
-      <FontAwesomeIcon icon={faSync} spin={spin} />
-    </Container>
-  );
-};
-
-export default RefreshButton;

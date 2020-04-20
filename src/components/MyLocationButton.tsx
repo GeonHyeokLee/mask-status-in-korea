@@ -5,6 +5,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCrosshairs } from "@fortawesome/free-solid-svg-icons";
 import { TMyLocationButtonComponentProps } from "../types";
 
+const MyLocationButton: React.FC<TMyLocationButtonComponentProps> = ({
+  myLocation,
+  onMoveLocation,
+}) => {
+  return (
+    <Container
+      onClick={
+        myLocation &&
+        onMoveLocation &&
+        (() => onMoveLocation(myLocation.lat, myLocation.lng))
+      }
+    >
+      <FontAwesomeIcon icon={faCrosshairs} />
+    </Container>
+  );
+};
+
+export default MyLocationButton;
+
 const Container = styled.div`
   width: 64px;
   display: flex;
@@ -31,22 +50,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const MyLocationButton: React.FC<TMyLocationButtonComponentProps> = ({
-  myLocation,
-  onMoveLocation
-}) => {
-  return (
-    <Container
-      onClick={
-        myLocation &&
-        onMoveLocation &&
-        (() => onMoveLocation(myLocation.lat, myLocation.lng))
-      }
-    >
-      <FontAwesomeIcon icon={faCrosshairs} />
-    </Container>
-  );
-};
-
-export default MyLocationButton;

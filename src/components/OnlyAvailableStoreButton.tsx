@@ -4,6 +4,31 @@ import { faToggleOff, faToggleOn } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import { color } from "../styles/colors";
 
+const OnlyAvailableStoreButton: React.FC<{
+  onlyAvailableStore: boolean;
+  setOnlyAvailableStore: React.Dispatch<React.SetStateAction<boolean>>;
+  setBubbleMessageStatus: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ onlyAvailableStore, setOnlyAvailableStore, setBubbleMessageStatus }) => {
+  const onClickProcess = (onlyAvailableStore: boolean) => {
+    return () => {
+      setBubbleMessageStatus(false);
+      setOnlyAvailableStore(!onlyAvailableStore);
+    };
+  };
+  const onClick = onClickProcess(onlyAvailableStore);
+
+  return (
+    <Container onClick={onClick}>
+      {!onlyAvailableStore && <FontAwesomeIcon icon={faToggleOff}></FontAwesomeIcon>}
+      {onlyAvailableStore && (
+        <FontAwesomeIcon icon={faToggleOn} className="on"></FontAwesomeIcon>
+      )}
+    </Container>
+  );
+};
+
+export default OnlyAvailableStoreButton;
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -31,36 +56,3 @@ const Container = styled.div`
     color: ${color.green};
   }
 `;
-
-const OnlyAvailableStoreButton: React.FC<{
-  onlyAvailableStore: boolean;
-  setOnlyAvailableStore: React.Dispatch<React.SetStateAction<boolean>>;
-  setBubbleMessageStatus: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ onlyAvailableStore, setOnlyAvailableStore, setBubbleMessageStatus }) => {
-  const onClickProcess = (
-    onlyAvailableStore: boolean,
-    setOnlyAvailableStore: React.Dispatch<React.SetStateAction<boolean>>,
-    setBubbleMessageStatus: React.Dispatch<React.SetStateAction<boolean>>
-  ) => {
-    return () => {
-      setBubbleMessageStatus(false);
-      setOnlyAvailableStore(!onlyAvailableStore);
-    };
-  };
-  const onClick = onClickProcess(
-    onlyAvailableStore,
-    setOnlyAvailableStore,
-    setBubbleMessageStatus
-  );
-
-  return (
-    <Container onClick={onClick}>
-      {!onlyAvailableStore && <FontAwesomeIcon icon={faToggleOff}></FontAwesomeIcon>}
-      {onlyAvailableStore && (
-        <FontAwesomeIcon icon={faToggleOn} className="on"></FontAwesomeIcon>
-      )}
-    </Container>
-  );
-};
-
-export default OnlyAvailableStoreButton;

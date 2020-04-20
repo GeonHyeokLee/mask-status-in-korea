@@ -5,6 +5,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamation } from "@fortawesome/free-solid-svg-icons";
 import { TNoticeButtonComponentProps } from "../types";
 
+const NoticeButton: React.FC<TNoticeButtonComponentProps> = ({ onToggleNotice }) => {
+  return (
+    <Container onClick={() => onToggleNotice(true)}>
+      <FontAwesomeIcon icon={faExclamation} />
+    </Container>
+  );
+};
+
+export default React.memo(NoticeButton);
+
 const Container = styled.div`
   width: 64px;
   cursor: pointer;
@@ -47,13 +57,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const NoticeButton: React.FC<TNoticeButtonComponentProps> = ({ onToggleNotice }) => {
-  return (
-    <Container onClick={() => onToggleNotice(true)}>
-      <FontAwesomeIcon icon={faExclamation} />
-    </Container>
-  );
-};
-
-export default React.memo(NoticeButton);

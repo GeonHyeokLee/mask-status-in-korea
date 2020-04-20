@@ -11,113 +11,12 @@ import NoticeButton from "./NoticeButton";
 import Notice from "./Notice";
 import LocationStorage from "./LocationStorage";
 import { GOOGLE_MAP_API, isDev } from "../dotenv";
-import { TStoreData, TInitEvent, TUpdateStoreData, TCurrentLocation } from "../types";
+import { TStoreData, TInitEvent, TCurrentLocation } from "../types";
 import { convertRemainStatusBoolean } from "../utils/convertRemainStatus";
 import OnlyAvailableStoreButton from "./OnlyAvailableStoreButton";
 import { color } from "../styles/colors";
 import { useSelector, useDispatch } from "../hooks/useRedux";
 import { useStoreData } from "../hooks/useStoreData";
-import { TGlobalAction } from "../modules/types";
-
-const Container = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  div.dummyContainer {
-    width: 100%;
-    height: 100%;
-  }
-`;
-
-const UtilWrap = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  margin: 20px;
-  display: flex;
-  flex-direction: column;
-  z-index: 99;
-  @media (max-width: 1023px) {
-    margin: 10px;
-  }
-  > div.util-button-wrap {
-    position: relative;
-    display: flex;
-    flex-direction: raw;
-    > div.bubble-message {
-      position: absolute;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      top: 32px;
-      right: -95px;
-      height: 40px;
-      font-size: 14px;
-      font-weight: bold;
-      padding: 10px;
-      border-radius: 0 40px 40px 40px;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: ${color.white};
-      cursor: pointer;
-      @media (max-width: 1023px) {
-        top: 16px;
-        right: -55px;
-        height: 25px;
-        font-size: 10px;
-      }
-      > span {
-        color: ${color.yellow};
-        margin-right: 10px;
-      }
-    }
-    > div {
-      margin-right: 20px;
-      :last-of-type {
-        margin-right: 0;
-      }
-      @media (max-width: 1023px) {
-        margin-right: 10px;
-        :last-of-type {
-          margin-right: 0;
-        }
-      }
-    }
-  }
-  > div {
-    margin-bottom: 20px;
-    :last-of-type {
-      margin-bottom: 0;
-    }
-    @media (max-width: 1023px) {
-      margin-bottom: 10px;
-      :last-of-type {
-        margin-bottom: 0;
-      }
-    }
-  }
-`;
-
-const InformationWrap = styled.div`
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  margin: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  z-index: 99;
-  @media (max-width: 1023px) {
-    margin: 10px;
-  }
-  > div:nth-child(1) {
-    margin-bottom: 20px;
-    @media (max-width: 1023px) {
-      margin-bottom: 10px;
-    }
-  }
-`;
 
 const Map: React.FC = () => {
   const [currentHoverStore, setCurrentHoverStore] = useState<string>("");
@@ -131,38 +30,25 @@ const Map: React.FC = () => {
     stores: storeList,
     updateStoreData,
     refreshLoading,
-    setRefreshLoading
+    setRefreshLoading,
   } = useStoreData();
 
-  const initEventProcess = useCallback(
-    (
-      setCurrentHoverStore: React.Dispatch<React.SetStateAction<string>>,
-      setCurrentClickStore: React.Dispatch<React.SetStateAction<string>>
-    ) => {
-      return (initHoverTrigger: boolean = true, initClickTrigger: boolean = true) => {
-        const initialStoreCode: string = "-999999";
-        if (initHoverTrigger) {
-          setCurrentHoverStore(initialStoreCode);
-        }
-        if (initClickTrigger) {
-          setCurrentClickStore(initialStoreCode);
-        }
-      };
-    },
-    []
-  );
+  const initEventProcess = useCallback(() => {
+    return (initHoverTrigger: boolean = true, initClickTrigger: boolean = true) => {
+      const initialStoreCode: string = "-999999";
+      if (initHoverTrigger) {
+        setCurrentHoverStore(initialStoreCode);
+      }
+      if (initClickTrigger) {
+        setCurrentClickStore(initialStoreCode);
+      }
+    };
+  }, []);
 
-  const initEvent: TInitEvent = initEventProcess(
-    setCurrentHoverStore,
-    setCurrentClickStore
-  );
+  const initEvent: TInitEvent = initEventProcess();
 
   const onMouseOverStoreProcess = useCallback(
-    (
-      initEvent: TInitEvent,
-      currentClickStore: string,
-      setCurrentHoverStore: React.Dispatch<React.SetStateAction<string>>
-    ) => {
+    (initEvent: TInitEvent, currentClickStore: string) => {
       return (code: string) => {
         if (code !== currentClickStore) {
           initEvent(false);
@@ -175,44 +61,28 @@ const Map: React.FC = () => {
     []
   );
 
-  const onMouseOverStore = onMouseOverStoreProcess(
-    initEvent,
-    currentClickStore,
-    setCurrentHoverStore
-  );
+  const onMouseOverStore = onMouseOverStoreProcess(initEvent, currentClickStore);
 
-  const onChangeMapProcess = useCallback(
-    (dispatch: React.Dispatch<TGlobalAction>, updateStoreData: TUpdateStoreData) => {
-      return async (value: ChangeEventValue) => {
-        dispatch({
-          type: "UPDATE_CURRENT_LOCATION",
-          payload: { lat: value.center.lat, lng: value.center.lng }
-        });
-        (await updateStoreData)(value.center.lat, value.center.lng);
-      };
-    },
-    []
-  );
-  const onChangeMap = onChangeMapProcess(dispatch, updateStoreData);
+  const onChangeMapProcess = useCallback(() => {
+    return async (value: ChangeEventValue) => {
+      dispatch({
+        type: "UPDATE_CURRENT_LOCATION",
+        payload: { lat: value.center.lat, lng: value.center.lng },
+      });
+      (await updateStoreData)(value.center.lat, value.center.lng);
+    };
+  }, [dispatch, updateStoreData]);
+  const onChangeMap = onChangeMapProcess();
 
-  const onZoomAnimationEndProcess = useCallback(
-    (dispatch: React.Dispatch<TGlobalAction>) => {
-      return (zoom: number) => {
-        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: zoom });
-      };
-    },
-    []
-  );
-  const onZoomAnimationEnd = onZoomAnimationEndProcess(dispatch);
+  const onZoomAnimationEndProcess = useCallback(() => {
+    return (zoom: number) => {
+      dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: zoom });
+    };
+  }, [dispatch]);
+  const onZoomAnimationEnd = onZoomAnimationEndProcess();
 
   const onClickStoreProcess = useCallback(
-    (
-      dispatch: React.Dispatch<TGlobalAction>,
-      initEvent: TInitEvent,
-      currentZoom: number,
-      currentClickStore: string,
-      setCurrentClickStore: React.Dispatch<React.SetStateAction<string>>
-    ) => {
+    (currentZoom: number, currentClickStore: string) => {
       return (lat: number, lng: number, code: string) => {
         initEvent();
         dispatch({ type: "UPDATE_CURRENT_LOCATION", payload: { lat, lng } });
@@ -226,40 +96,31 @@ const Map: React.FC = () => {
         }
       };
     },
-    []
+    [dispatch, initEvent]
   );
 
-  const onClickStore = onClickStoreProcess(
-    dispatch,
-    initEvent,
-    currentZoom,
-    currentClickStore,
-    setCurrentClickStore
-  );
+  const onClickStore = onClickStoreProcess(currentZoom, currentClickStore);
 
-  const onMoveLocationProcess = useCallback(
-    (dispatch: React.Dispatch<TGlobalAction>, initEvent: TInitEvent) => {
-      return (lat: number, lng: number) => {
-        initEvent();
-        dispatch({ type: "UPDATE_CURRENT_LOCATION", payload: { lat, lng } });
-        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
-      };
-    },
-    []
-  );
-  const onMoveLocation = onMoveLocationProcess(dispatch, initEvent);
+  const onMoveLocationProcess = useCallback(() => {
+    return (lat: number, lng: number) => {
+      initEvent();
+      dispatch({ type: "UPDATE_CURRENT_LOCATION", payload: { lat, lng } });
+      dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
+    };
+  }, [dispatch, initEvent]);
+  const onMoveLocation = onMoveLocationProcess();
 
   const onRefreshStoreDataProcess = useCallback(
-    (currentLocation: TCurrentLocation, updateStoreData: TUpdateStoreData) => {
+    (currentLocation: TCurrentLocation) => {
       return async () => {
         if (currentLocation) {
           (await updateStoreData)(currentLocation.lat, currentLocation.lng);
         }
       };
     },
-    []
+    [updateStoreData]
   );
-  const onRefreshStoreData = onRefreshStoreDataProcess(currentLocation, updateStoreData);
+  const onRefreshStoreData = onRefreshStoreDataProcess(currentLocation);
 
   return (
     <>
@@ -360,3 +221,103 @@ const Map: React.FC = () => {
 };
 
 export default React.memo(Map);
+
+const Container = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  div.dummyContainer {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
+const UtilWrap = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  z-index: 99;
+  @media (max-width: 1023px) {
+    margin: 10px;
+  }
+  > div.util-button-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: raw;
+    > div.bubble-message {
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      top: 32px;
+      right: -95px;
+      height: 40px;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 0 40px 40px 40px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: ${color.white};
+      cursor: pointer;
+      @media (max-width: 1023px) {
+        top: 16px;
+        right: -55px;
+        height: 25px;
+        font-size: 10px;
+      }
+      > span {
+        color: ${color.yellow};
+        margin-right: 10px;
+      }
+    }
+    > div {
+      margin-right: 20px;
+      :last-of-type {
+        margin-right: 0;
+      }
+      @media (max-width: 1023px) {
+        margin-right: 10px;
+        :last-of-type {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+  > div {
+    margin-bottom: 20px;
+    :last-of-type {
+      margin-bottom: 0;
+    }
+    @media (max-width: 1023px) {
+      margin-bottom: 10px;
+      :last-of-type {
+        margin-bottom: 0;
+      }
+    }
+  }
+`;
+
+const InformationWrap = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  z-index: 99;
+  @media (max-width: 1023px) {
+    margin: 10px;
+  }
+  > div:nth-child(1) {
+    margin-bottom: 20px;
+    @media (max-width: 1023px) {
+      margin-bottom: 10px;
+    }
+  }
+`;

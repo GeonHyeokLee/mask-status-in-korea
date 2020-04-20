@@ -3,16 +3,9 @@ import Map from "./components/Map";
 import { InitialStyle } from "./styles/initialStyles";
 import styled from "styled-components";
 import Loading from "./components/common/Loading";
-import { TSuccessGetCurrentPositionCallbackData, TUpdateStoreData } from "./types";
+import { TSuccessGetCurrentPositionCallbackData } from "./types";
 import { useStoreData } from "./hooks/useStoreData";
 import { useDispatch } from "./hooks/useRedux";
-import { TGlobalAction } from "./modules/types";
-
-const Container = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100vh;
-`;
 
 function App() {
   const [mapLoading, setMapLoading] = useState<boolean>(true);
@@ -20,21 +13,15 @@ function App() {
   const { updateStoreData } = useStoreData();
 
   const successGetCurrentPositionProcess = useCallback(
-    (
-      data: TSuccessGetCurrentPositionCallbackData,
-      dispatch: React.Dispatch<TGlobalAction>,
-      updateStoreData: TUpdateStoreData,
-      mapLoading: boolean,
-      setMapLoading: React.Dispatch<React.SetStateAction<boolean>>
-    ) => {
+    (data: TSuccessGetCurrentPositionCallbackData, mapLoading: boolean) => {
       return async () => {
         dispatch({
           type: "UPDATE_CURRENT_LOCATION",
-          payload: { lat: data.coords.latitude, lng: data.coords.longitude }
+          payload: { lat: data.coords.latitude, lng: data.coords.longitude },
         });
         dispatch({
           type: "UPDATE_MY_LOCATION",
-          payload: { lat: data.coords.latitude, lng: data.coords.longitude }
+          payload: { lat: data.coords.latitude, lng: data.coords.longitude },
         });
         (await updateStoreData)(data.coords.latitude, data.coords.longitude);
         if (mapLoading) {
@@ -42,28 +29,23 @@ function App() {
         }
       };
     },
-    []
+    [dispatch, updateStoreData]
   );
 
   const failureGetCurrentPositionProcess = useCallback(
-    async (
-      dispatch: React.Dispatch<TGlobalAction>,
-      updateStoreData: TUpdateStoreData,
-      mapLoading: boolean,
-      setMapLoading: React.Dispatch<React.SetStateAction<boolean>>
-    ) => {
+    async (mapLoading: boolean) => {
       return async () => {
         const INITIAL_COORDS = {
           lat: 37.576333,
-          lng: 126.976806
+          lng: 126.976806,
         };
         dispatch({
           type: "UPDATE_CURRENT_LOCATION",
-          payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng }
+          payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng },
         });
         dispatch({
           type: "UPDATE_MY_LOCATION",
-          payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng }
+          payload: { lat: INITIAL_COORDS.lat, lng: INITIAL_COORDS.lng },
         });
         (await updateStoreData)(INITIAL_COORDS.lat, INITIAL_COORDS.lng);
         if (mapLoading) {
@@ -71,27 +53,21 @@ function App() {
         }
       };
     },
-    []
+    [dispatch, updateStoreData]
   );
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
-      data => {
+      (data) => {
         const successGetCurrentPosition = successGetCurrentPositionProcess(
           data,
-          dispatch,
-          updateStoreData,
-          mapLoading,
-          setMapLoading
+          mapLoading
         );
         successGetCurrentPosition();
       },
       async () => {
         const failureGetCurrentPosition = await failureGetCurrentPositionProcess(
-          dispatch,
-          updateStoreData,
-          mapLoading,
-          setMapLoading
+          mapLoading
         );
         failureGetCurrentPosition();
       },
@@ -110,3 +86,9 @@ function App() {
 }
 
 export default React.memo(App);
+
+const Container = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100vh;
+`;

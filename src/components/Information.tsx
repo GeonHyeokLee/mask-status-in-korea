@@ -4,6 +4,43 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { color } from "../styles/colors";
 
+const Information: React.FC = () => {
+  return (
+    <Container>
+      <ul>
+        <li>
+          <p>100개 이상 </p>
+          <FontAwesomeIcon icon={faPlusCircle} color={color.green} />
+        </li>
+        <li>
+          <p>30개 이상 100개 미만</p>
+          <FontAwesomeIcon icon={faPlusCircle} color={color.yellow} />
+        </li>
+        <li>
+          <p>2개 이상 30개 미만</p>
+          <FontAwesomeIcon icon={faPlusCircle} color={color.red} />
+        </li>
+        <li>
+          <p>1개 이하 또는 재고 소진</p>
+          <FontAwesomeIcon icon={faPlusCircle} color={color.black} />
+        </li>
+      </ul>
+      <div>
+        <h3>
+          <b>최대 2km이내</b>의 약국을 볼 수 있어요
+        </h3>
+        <h3>
+          <span role="img" aria-label="notice">
+            데스크탑, 모바일 모두 지원해요 😁
+          </span>
+        </h3>
+      </div>
+    </Container>
+  );
+};
+
+export default React.memo(Information);
+
 const Container = styled.div`
   display: flex;
   border-radius: 3px;
@@ -62,40 +99,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const Information: React.FC = () => {
-  return (
-    <Container>
-      <ul>
-        <li>
-          <p>100개 이상 </p>
-          <FontAwesomeIcon icon={faPlusCircle} color={color.green} />
-        </li>
-        <li>
-          <p>30개 이상 100개 미만</p>
-          <FontAwesomeIcon icon={faPlusCircle} color={color.yellow} />
-        </li>
-        <li>
-          <p>2개 이상 30개 미만</p>
-          <FontAwesomeIcon icon={faPlusCircle} color={color.red} />
-        </li>
-        <li>
-          <p>1개 이하 또는 재고 소진</p>
-          <FontAwesomeIcon icon={faPlusCircle} color={color.black} />
-        </li>
-      </ul>
-      <div>
-        <h3>
-          <b>최대 2km이내</b>의 약국을 볼 수 있어요
-        </h3>
-        <h3>
-          <span role="img" aria-label="notice">
-            데스크탑, 모바일 모두 지원해요 😁
-          </span>
-        </h3>
-      </div>
-    </Container>
-  );
-};
-
-export default React.memo(Information);

@@ -3,6 +3,53 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { TNoticeComponentProps } from "../types";
 
+const Notice: React.FC<TNoticeComponentProps> = ({ onToggleNotice }) => {
+  return (
+    <Container>
+      <ul>
+        <h1>공지사항</h1>
+        <li>
+          <h3>공적 마스크 현황 (feat.코로나 싫어요)</h3>
+          <span role="img" aria-label="notice">
+            <b>건강보험심사평가원</b>이 제공하는 재고 현황을 토대로 갱신되요. 현장에서의
+            재고 상황과 다를수 있어요.
+          </span>
+        </li>
+        <li>
+          <h3>업데이트 내역</h3>
+          <div>
+            <h4>버전 0.1.0</h4>
+            <span>전국의 약국 마스크 재고 현황 추가</span>
+          </div>
+          <div>
+            <h4>버전 0.2.0</h4>
+            <span>모바일 지원 및 주소 검색, 내 위치로 이동, 새로고침 추가</span>
+          </div>
+          <div>
+            <h4>버전 0.3.0</h4>
+            <span>성능 최적화, 아이콘 수정, 공지사항 추가</span>
+          </div>
+          <div>
+            <h4>버전 0.4.0</h4>
+            <span>필터링 추가</span>
+          </div>
+        </li>
+        <li>
+          <span>
+            Made by <b>GeonHyeok Lee</b>
+          </span>
+          <span>연락처: geonhyeoklee.kr@gmail.com</span>
+        </li>
+        <li>
+          <button onClick={() => onToggleNotice(false)}>닫기</button>
+        </li>
+      </ul>
+    </Container>
+  );
+};
+
+export default React.memo(Notice);
+
 const Container = styled.div`
   position: fixed;
   display: flex;
@@ -102,50 +149,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const Notice: React.FC<TNoticeComponentProps> = ({ onToggleNotice }) => {
-  return (
-    <Container>
-      <ul>
-        <h1>공지사항</h1>
-        <li>
-          <h3>공적 마스크 현황 (feat.코로나 싫어요)</h3>
-          <span role="img" aria-label="notice">
-            <b>건강보험심사평가원</b>이 제공하는 재고 현황을 토대로 갱신되요. 현장에서의
-            재고 상황과 다를수 있어요.
-          </span>
-        </li>
-        <li>
-          <h3>업데이트 내역</h3>
-          <div>
-            <h4>버전 0.1.0</h4>
-            <span>전국의 약국 마스크 재고 현황 추가</span>
-          </div>
-          <div>
-            <h4>버전 0.2.0</h4>
-            <span>모바일 지원 및 주소 검색, 내 위치로 이동, 새로고침 추가</span>
-          </div>
-          <div>
-            <h4>버전 0.3.0</h4>
-            <span>성능 최적화, 아이콘 수정, 공지사항 추가</span>
-          </div>
-          <div>
-            <h4>버전 0.4.0</h4>
-            <span>필터링 추가</span>
-          </div>
-        </li>
-        <li>
-          <span>
-            Made by <b>GeonHyeok Lee</b>
-          </span>
-          <span>연락처: geonhyeoklee.kr@gmail.com</span>
-        </li>
-        <li>
-          <button onClick={() => onToggleNotice(false)}>닫기</button>
-        </li>
-      </ul>
-    </Container>
-  );
-};
-
-export default React.memo(Notice);

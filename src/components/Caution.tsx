@@ -2,6 +2,18 @@ import React from "react";
 import styled from "styled-components";
 import { color } from "../styles/colors";
 
+const Caution: React.FC = () => {
+  return (
+    <Container>
+      <span role="img" aria-label="caution">
+        확대하면 보여요😅
+      </span>
+    </Container>
+  );
+};
+
+export default React.memo(Caution);
+
 const Container = styled.div`
   position: fixed;
   width: 300px;
@@ -27,15 +39,3 @@ const Container = styled.div`
     font-size: 17px;
   }
 `;
-
-const Caution: React.FC = () => {
-  return (
-    <Container>
-      <span role="img" aria-label="caution">
-        확대하면 보여요😅
-      </span>
-    </Container>
-  );
-};
-
-export default React.memo(Caution);

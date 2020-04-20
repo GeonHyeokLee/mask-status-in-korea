@@ -3,10 +3,78 @@ import styled from "styled-components";
 import { color } from "../styles/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearchLocation } from "@fortawesome/free-solid-svg-icons";
-import { TAddress, TSetAddress, TOnSubmitAddress, TGeoCode } from "../types";
+import { TAddress } from "../types";
 import { useDispatch } from "../hooks/useRedux";
-import { TGlobalAction } from "../modules/types";
-import { geoCode } from "../utils/geoCode";
+import { useGeoCode } from "../hooks/useGeoCode";
+
+const AddressBar: React.FC = () => {
+  const [address, setAddress] = useState<TAddress>("");
+  const ref = useRef<HTMLButtonElement>(null);
+  const dispatch = useDispatch();
+  const { mutation: geoCode } = useGeoCode();
+
+  const onSubmitAddressProcess = useCallback(() => {
+    return async (address: string) => {
+      const place = await geoCode(address);
+      if (!place?.geometry) {
+        setAddress("");
+        return null;
+      }
+      dispatch({
+        type: "UPDATE_CURRENT_LOCATION",
+        payload: { lat: place?.geometry.location.lat, lng: place?.geometry.location.lng },
+      });
+      dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
+      setAddress("");
+    };
+  }, [dispatch, geoCode]);
+  const onSubmitAddress = onSubmitAddressProcess();
+
+  const onChangeInputProcess = useCallback(() => {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        target: { value },
+      } = event;
+      setAddress(value);
+    };
+  }, []);
+  const onChangeInput = onChangeInputProcess();
+
+  const onSubmitFormProcess = useCallback(
+    (address: TAddress, ref: any) => {
+      return async (
+        event:
+          | React.FormEvent<HTMLFormElement>
+          | React.MouseEvent<HTMLButtonElement, MouseEvent>
+          | React.TouchEvent<HTMLButtonElement>
+      ) => {
+        event.preventDefault();
+        await onSubmitAddress(address);
+        ref.current.focus();
+      };
+    },
+    [onSubmitAddress]
+  );
+  const onSubmitForm = onSubmitFormProcess(address, ref);
+
+  return (
+    <Container>
+      <form onSubmit={onSubmitForm}>
+        <input
+          name="address"
+          placeholder="주소 검색"
+          onChange={onChangeInput}
+          value={address}
+        />
+        <button onClick={onSubmitForm} onTouchEnd={onSubmitForm} ref={ref}>
+          <FontAwesomeIcon icon={faSearchLocation} />
+        </button>
+      </form>
+    </Container>
+  );
+};
+
+export default React.memo(AddressBar);
 
 const Container = styled.div`
   display: flex;
@@ -78,74 +146,3 @@ const Container = styled.div`
     }
   }
 `;
-
-const AddressBar: React.FC = () => {
-  const [address, setAddress] = useState<TAddress>("");
-  const ref = useRef<HTMLButtonElement>(null);
-  const dispatch = useDispatch();
-
-  const onSubmitAddressProcess = useCallback(
-    (
-      dispatch: React.Dispatch<TGlobalAction>,
-      geoCode: TGeoCode,
-      setAddress: TSetAddress
-    ) => {
-      return async (address: string) => {
-        const result = await geoCode(address);
-        dispatch({
-          type: "UPDATE_CURRENT_LOCATION",
-          payload: { lat: result.lat, lng: result.lng }
-        });
-        dispatch({ type: "UPDATE_CURRENT_ZOOM", payload: 16 });
-        setAddress("");
-      };
-    },
-    []
-  );
-  const onSubmitAddress = onSubmitAddressProcess(dispatch, geoCode, setAddress);
-
-  const onChangeInputProcess = useCallback((setAddress: TSetAddress) => {
-    return (event: React.ChangeEvent<HTMLInputElement>) => {
-      const {
-        target: { value }
-      } = event;
-      setAddress(value);
-    };
-  }, []);
-  const onChangeInput = onChangeInputProcess(setAddress);
-
-  const onSubmitFormProcess = useCallback(
-    (onSubmitAddress: TOnSubmitAddress, address: TAddress, ref: any) => {
-      return async (
-        event:
-          | React.FormEvent<HTMLFormElement>
-          | React.MouseEvent<HTMLButtonElement, MouseEvent>
-          | React.TouchEvent<HTMLButtonElement>
-      ) => {
-        event.preventDefault();
-        await onSubmitAddress(address);
-        ref.current.focus();
-      };
-    },
-    []
-  );
-  const onSubmitForm = onSubmitFormProcess(onSubmitAddress, address, ref);
-
-  return (
-    <Container>
-      <form onSubmit={onSubmitForm}>
-        <input
-          name="address"
-          placeholder="주소 검색"
-          onChange={onChangeInput}
-          value={address}
-        />
-        <button onClick={onSubmitForm} onTouchEnd={onSubmitForm} ref={ref}>
-          <FontAwesomeIcon icon={faSearchLocation} />
-        </button>
-      </form>
-    </Container>
-  );
-};
-
-export default React.memo(AddressBar);
