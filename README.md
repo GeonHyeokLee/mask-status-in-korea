@@ -14,5 +14,5 @@
 
 ![](https://res.cloudinary.com/dbhq9nlnc/image/upload/c_scale,w_300/v1587276540/resume/nomadcoder_news_letter_dr0pjk.jpg)
 
-- 노마드코더 커뮤니티의 뉴스레터에 기고되었습니다.
+- 노마드코더 커뮤니티의 뉴스레터에 기고하였습니다.
 - [뉴스레터 보기(PDF)](https://res.cloudinary.com/dbhq9nlnc/image/upload/c_scale,w_368/v1587276522/resume/Nomadcoder_news_letter_rclgim.pdf)
